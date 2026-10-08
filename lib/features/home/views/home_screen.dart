@@ -207,9 +207,9 @@ class HomeScreen extends StatelessWidget {
                 // Stats
                 if (profile != null) ...[
                   SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
                       Container(
                         width: 100,
                         padding: const EdgeInsets.all(16),
@@ -472,7 +472,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              ],
+              ),
             ],
           ),
         );
