@@ -186,32 +186,33 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(width: 16),
                     Expanded(
                       child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.local_fire_department, color: Colors.black, size: 28),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${profile.streak}',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.black,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.local_fire_department, color: Colors.black, size: 28),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${profile.streak}',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.black,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            'Day Streak',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
+                            const Text(
+                              'Day Streak',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
