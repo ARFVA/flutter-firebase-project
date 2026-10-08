@@ -147,15 +147,19 @@ class HomeScreen extends StatelessWidget {
                             },
                             child: Row(
                               children: [
-                                Text(
-                                  user.displayName ?? user.email ?? 'User',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.black,
+                                Expanded(
+                                  child: Text(
+                                    user.displayName ?? user.email ?? 'User',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 4),
                                 Icon(Icons.edit, size: 16, color: Colors.grey),
                               ],
                             ),
