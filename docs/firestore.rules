@@ -4,8 +4,19 @@ service cloud.firestore {
 
     // Users collection
     match /users/{userId} {
-      // Allow read/write if user is the owner
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow read if user is the owner
+      allow read: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow create if user is the owner
+      allow create: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow update only for safe fields
+      // Note: In production, xp, level, and streak should be updated by Cloud Functions
+      allow update: if request.auth != null 
+                    && request.auth.uid == userId
+                    && request.resource.data.xp == resource.data.xp
+                    && request.resource.data.level == resource.data.level
+                    && request.resource.data.streak == resource.data.streak;
     }
 
     // Quests collection
@@ -30,11 +41,17 @@ service cloud.firestore {
 
     // Activities collection
     match /activities/{activityId} {
-      // Allow read/write if user owns the activity
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Allow read if user owns the activity
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       
       // Allow create if user is authenticated and setting their own userId
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      
+      // Prevent updates (activities should be immutable)
+      allow update: if false;
+      
+      // Allow delete if user owns the activity
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // Achievements collection (read-only for all authenticated users)

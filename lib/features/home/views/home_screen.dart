@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final profileController = Get.find<ProfileController>();
 
     return Scaffold(
       appBar: AppBar(
@@ -35,6 +37,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Obx(() {
         final user = authController.currentUser;
+        final profile = profileController.profile;
 
         if (user == null) {
           return const Center(
@@ -42,39 +45,135 @@ class HomeScreen extends StatelessWidget {
           );
         }
 
-        return Center(
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.deepPurple,
-                child: Text(
-                  user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+              // User info card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.deepPurple,
+                        child: Text(
+                          user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
+                          style: const TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.displayName ?? user.email ?? 'User',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              profile != null ? 'Level ${profile.level}' : 'Loading...',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              
+              // Stats cards
+              if (profile != null) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.star, color: Colors.amber, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${profile.xp}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Text('Total XP'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.local_fire_department, color: Colors.orange, size: 32),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${profile.streak}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const Text('Day Streak'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Daily Target'),
+                            Text('${profile.dailyTargetXp} XP'),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: 0.5, // Will be calculated from today's XP
+                          backgroundColor: Colors.grey[300],
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              
               const SizedBox(height: 24),
-              Text(
-                'Welcome, ${user.displayName ?? user.email ?? "User"}!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                user.email ?? '',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 48),
+              
+              // Quest button
               Card(
                 margin: const EdgeInsets.symmetric(horizontal: 32),
                 child: Padding(
@@ -82,7 +181,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const Text(
-                        'Phase 4: Quest System',
+                        'Phase 5: Gamification System',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -90,7 +189,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Create and complete your study quests!',
+                        'Complete quests to earn XP and level up!',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),

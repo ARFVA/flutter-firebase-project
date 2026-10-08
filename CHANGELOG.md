@@ -3,6 +3,37 @@
 All notable changes to **StudyQuest** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.4.0-beta.1] - 2026-10-08
+
+### Added
+- Activity model for tracking user actions
+- GamificationUtils with XP and level calculation
+- ActivityRemoteDataSource for Firestore operations
+- ActivityRepository with clean architecture
+- ProfileController for user profile management
+- XP calculation on quest completion
+- Level calculation formula (Level = floor(sqrt(XP/100)) + 1)
+- Level up notifications
+- Activity history recording
+- Daily XP tracking
+- Streak calculation (simplified - server-side in Phase 10)
+- Home screen redesign with stats display
+- Enhanced Firestore Security Rules to prevent XP manipulation
+
+### Changed
+- Updated QuestController to integrate XP system
+- Updated home screen to show user stats (XP, level, streak)
+- Updated Firestore Security Rules for users and activities
+- Activities are now immutable (prevent updates)
+
+### Fixed
+- Type casting issue in activity datasource
+
+### Security
+- Security rules prevent direct manipulation of xp, level, and streak from client
+- Activities are immutable once created
+- User profile updates restricted to safe fields only
+
 ## [0.3.0-beta.1] - 2026-10-08
 
 ### Added

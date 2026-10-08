@@ -1,14 +1,25 @@
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/quest_model.dart';
+import 'package:studyquest/data/models/activity_model.dart';
 import 'package:studyquest/data/repositories/quest_repository_impl.dart';
+import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
+import 'package:studyquest/data/repositories/activity_repository_impl.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/core/utils/gamification_utils.dart';
 import 'package:uuid/uuid.dart';
 
 class QuestController extends GetxController {
   final QuestRepository repository;
   final AuthController authController;
+  final UserProfileRepository userProfileRepository;
+  final ActivityRepository activityRepository;
 
-  QuestController(this.repository, this.authController);
+  QuestController(
+    this.repository,
+    this.authController,
+    this.userProfileRepository,
+    this.activityRepository,
+  );
 
   // Quest state
   final RxList<QuestModel> _quests = <QuestModel>[].obs;
@@ -168,9 +179,16 @@ class QuestController extends GetxController {
     _isLoading.value = true;
     _errorMessage.value = '';
 
-    final result = await repository.completeQuest(questId);
+    final user = authController.currentUser;
+    if (user == null) {
+      _isLoading.value = false;
+      return;
+    }
 
-    result.fold(
+    // Get quest details
+    final questResult = await repository.getQuest(questId);
+    
+    questResult.fold(
       (failure) {
         _errorMessage.value = failure.message;
         _isLoading.value = false;
@@ -180,14 +198,100 @@ class QuestController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
       },
-      (_) {
-        _isLoading.value = false;
-        Get.snackbar(
-          'Success',
-          'Quest completed! +XP',
-          snackPosition: SnackPosition.BOTTOM,
+      (quest) async {
+        if (quest == null || quest.isCompleted) {
+          _isLoading.value = false;
+          return;
+        }
+
+        // Complete the quest
+        final completeResult = await repository.completeQuest(questId);
+
+        completeResult.fold(
+          (failure) {
+            _errorMessage.value = failure.message;
+            _isLoading.value = false;
+            Get.snackbar(
+              'Error',
+              failure.message,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          },
+          (_) async {
+            // Get user profile
+            final profileResult = await userProfileRepository.getUserProfile(user.uid);
+            
+            profileResult.fold(
+              (failure) {
+                _errorMessage.value = failure.message;
+                _isLoading.value = false;
+              },
+              (profile) async {
+                if (profile == null) {
+                  _isLoading.value = false;
+                  return;
+                }
+
+                // Calculate new XP and level
+                final newXP = profile.xp + quest.xp;
+                final newLevel = GamificationUtils.calculateLevel(newXP);
+                final leveledUp = newLevel > profile.level;
+
+                // Update user profile
+                final updatedProfile = profile.copyWith(
+                  xp: newXP,
+                  level: newLevel,
+                  updatedAt: DateTime.now(),
+                );
+
+                await userProfileRepository.updateUserProfile(updatedProfile);
+
+                // Create activity record
+                final activityId = const Uuid().v4();
+                final activity = ActivityModel.create(
+                  id: activityId,
+                  userId: user.uid,
+                  type: 'quest_complete',
+                  description: 'Completed "${quest.title}"',
+                  xpGained: quest.xp,
+                );
+
+                await activityRepository.createActivity(activity);
+
+                // Check daily target and update streak
+                final todayXpResult = await activityRepository.getTodayXp(user.uid);
+                todayXpResult.fold(
+                  (failure) {},
+                  (todayXp) async {
+                    if (GamificationUtils.isDailyTargetMet(todayXp, profile.dailyTargetXp)) {
+                      // Update streak (simplified - in production this should be server-side)
+                      final updatedStreakProfile = updatedProfile.copyWith(
+                        streak: profile.streak + 1,
+                        updatedAt: DateTime.now(),
+                      );
+                      await userProfileRepository.updateUserProfile(updatedStreakProfile);
+                    }
+                  },
+                );
+
+                _isLoading.value = false;
+                
+                String message = 'Quest completed! +${quest.xp} XP';
+                if (leveledUp) {
+                  message += '\n🎉 Level Up! You are now level $newLevel';
+                }
+                
+                Get.snackbar(
+                  'Success',
+                  message,
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 3),
+                );
+                loadQuests();
+              },
+            );
+          },
         );
-        loadQuests();
       },
     );
   }

@@ -7,11 +7,14 @@ import 'routes/app_pages.dart';
 import 'data/datasources/auth_datasource.dart';
 import 'data/datasources/firestore_datasource.dart';
 import 'data/datasources/quest_datasource.dart';
+import 'data/datasources/activity_datasource.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/user_profile_repository_impl.dart';
 import 'data/repositories/quest_repository_impl.dart';
+import 'data/repositories/activity_repository_impl.dart';
 import 'features/auth/controllers/auth_controller.dart';
 import 'features/quests/controllers/quest_controller.dart';
+import 'features/profile/controllers/profile_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
@@ -37,23 +40,35 @@ void main() async {
   final questRemoteDataSource = QuestRemoteDataSourceImpl(FirebaseFirestore.instance);
   final questRepository = QuestRepositoryImpl(questRemoteDataSource);
 
+  final activityRemoteDataSource = ActivityRemoteDataSourceImpl(FirebaseFirestore.instance);
+  final activityRepository = ActivityRepositoryImpl(activityRemoteDataSource);
+
   final authController = AuthController(authRepository, userProfileRepository);
-  final questController = QuestController(questRepository, authController);
+  final questController = QuestController(
+    questRepository,
+    authController,
+    userProfileRepository,
+    activityRepository,
+  );
+  final profileController = ProfileController(userProfileRepository, authController);
 
   runApp(StudyQuestApp(
     authController: authController,
     questController: questController,
+    profileController: profileController,
   ));
 }
 
 class StudyQuestApp extends StatelessWidget {
   final AuthController authController;
   final QuestController questController;
+  final ProfileController profileController;
 
   const StudyQuestApp({
     super.key,
     required this.authController,
     required this.questController,
+    required this.profileController,
   });
 
   @override
@@ -69,6 +84,7 @@ class StudyQuestApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(authController);
         Get.put(questController);
+        Get.put(profileController);
       }),
     );
   }
