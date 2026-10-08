@@ -147,6 +147,64 @@ class StudyRoomScreen extends StatelessWidget {
 
         return Column(
           children: [
+            // Room info header
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade300),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.meeting_room, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Room ID',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              roomController.currentRoomId,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.copy, size: 20),
+                        onPressed: () {
+                          // Copy room ID to clipboard
+                          // Note: Need to add flutter/services dependency for clipboard
+                          Get.snackbar(
+                            'Room ID',
+                            roomController.currentRoomId,
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.black87,
+                            colorText: Colors.white,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: Obx(() {
                 final participants = roomController.participants;
@@ -260,7 +318,7 @@ class StudyRoomScreen extends StatelessWidget {
           controller: roomNameController,
           decoration: const InputDecoration(
             labelText: 'Room Name',
-            hintText: 'Firebase Study Room',
+            hintText: 'Study Session 1',
             border: OutlineInputBorder(),
           ),
         ),
@@ -277,7 +335,7 @@ class StudyRoomScreen extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.blue.shade700,
               foregroundColor: Colors.white,
             ),
             child: const Text('Create'),

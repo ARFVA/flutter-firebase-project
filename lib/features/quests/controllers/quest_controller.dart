@@ -113,6 +113,8 @@ class QuestController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -121,6 +123,8 @@ class QuestController extends GetxController {
           'Success',
           'Quest created successfully!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
         Get.off(() => const QuestListScreen()); // Navigate to quest list
         loadQuests();
@@ -142,6 +146,8 @@ class QuestController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -150,6 +156,8 @@ class QuestController extends GetxController {
           'Success',
           'Quest updated successfully!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
         loadQuests();
       },
@@ -170,6 +178,8 @@ class QuestController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -178,6 +188,8 @@ class QuestController extends GetxController {
           'Success',
           'Quest deleted successfully!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
         loadQuests();
       },
@@ -205,6 +217,8 @@ class QuestController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (quest) async {
@@ -224,6 +238,8 @@ class QuestController extends GetxController {
               'Error',
               failure.message,
               snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red.shade700,
+              colorText: Colors.white,
             );
           },
           (_) async {
@@ -234,6 +250,13 @@ class QuestController extends GetxController {
               (failure) {
                 _errorMessage.value = failure.message;
                 _isLoading.value = false;
+                Get.snackbar(
+                  'Error',
+                  failure.message,
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.red.shade700,
+                  colorText: Colors.white,
+                );
               },
               (profile) async {
                 if (profile == null) {

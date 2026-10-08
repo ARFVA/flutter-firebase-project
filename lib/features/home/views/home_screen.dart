@@ -4,9 +4,56 @@ import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/study_room/views/study_room_screen.dart';
+import 'package:studyquest/data/models/user_profile_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  void _showEditNameDialog(UserProfileModel? profile, dynamic user, ProfileController profileController) {
+    final nameController = TextEditingController(text: user.displayName ?? '');
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Edit Display Name'),
+        content: TextField(
+          controller: nameController,
+          decoration: const InputDecoration(
+            labelText: 'Display Name',
+            hintText: 'Enter your name',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (nameController.text.trim().isNotEmpty) {
+                Get.back();
+                // Update display name in Firebase Auth
+                user.updateDisplayName(nameController.text.trim());
+                // Update profile name in Firestore
+                if (profile != null) {
+                  final updatedProfile = profile.copyWith(
+                    displayName: nameController.text.trim(),
+                    updatedAt: DateTime.now(),
+                  );
+                  profileController.updateUserProfile(updatedProfile);
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade700,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +126,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 32,
-                      backgroundColor: Colors.black,
+                      backgroundColor: Colors.blue.shade700,
                       child: Text(
                         user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
                         style: const TextStyle(
@@ -94,12 +141,23 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            user.displayName ?? user.email ?? 'User',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black,
+                          GestureDetector(
+                            onTap: () {
+                              _showEditNameDialog(profile, user, profileController);
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  user.displayName ?? user.email ?? 'User',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(Icons.edit, size: 16, color: Colors.grey),
+                              ],
                             ),
                           ),
                           Text(

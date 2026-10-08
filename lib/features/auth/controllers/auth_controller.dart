@@ -61,6 +61,8 @@ class AuthController extends GetxController {
           'Registration Failed',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (user) async {
@@ -83,6 +85,8 @@ class AuthController extends GetxController {
               'Profile Creation Failed',
               failure.message,
               snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.red.shade700,
+              colorText: Colors.white,
             );
           },
           (_) {
@@ -91,6 +95,8 @@ class AuthController extends GetxController {
               'Success',
               'Registration successful!',
               snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green.shade700,
+              colorText: Colors.white,
             );
             Get.offAllNamed('/home');
           },
@@ -119,6 +125,8 @@ class AuthController extends GetxController {
           'Login Failed',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (user) {
@@ -127,6 +135,8 @@ class AuthController extends GetxController {
           'Success',
           'Login successful!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
         Get.offAllNamed('/home');
       },
@@ -146,6 +156,8 @@ class AuthController extends GetxController {
           'Logout Failed',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -154,6 +166,8 @@ class AuthController extends GetxController {
           'Success',
           'Logged out successfully',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
       },
     );
@@ -172,6 +186,8 @@ class AuthController extends GetxController {
           'Reset Failed',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -180,6 +196,8 @@ class AuthController extends GetxController {
           'Success',
           'Password reset email sent',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
       },
     );
@@ -203,6 +221,8 @@ class AuthController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (verificationId) {
@@ -230,6 +250,8 @@ class AuthController extends GetxController {
           'Verification Failed',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (user) async {
@@ -259,6 +281,8 @@ class AuthController extends GetxController {
           'Success',
           'Phone verification successful!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
         Get.offAllNamed('/home');
       },
