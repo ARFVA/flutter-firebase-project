@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/constants/app_constants.dart';
+import 'routes/app_pages.dart';
+import 'data/datasources/auth_datasource.dart';
+import 'data/repositories/auth_repository_impl.dart';
+import 'features/auth/controllers/auth_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,11 +21,18 @@ void main() async {
     debugPrint('Firebase not initialized: $e');
   }
 
-  runApp(const StudyQuestApp());
+  // Initialize dependencies
+  final authRemoteDataSource = AuthRemoteDataSourceImpl(FirebaseAuth.instance);
+  final authRepository = AuthRepositoryImpl(authRemoteDataSource);
+  final authController = AuthController(authRepository);
+
+  runApp(StudyQuestApp(authController: authController));
 }
 
 class StudyQuestApp extends StatelessWidget {
-  const StudyQuestApp({super.key});
+  final AuthController authController;
+
+  const StudyQuestApp({super.key, required this.authController});
 
   @override
   Widget build(BuildContext context) {
@@ -30,47 +42,11 @@ class StudyQuestApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppConstants.appName),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Welcome to StudyQuest',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Phase 1: Firebase Setup In Progress',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Firebase Core dependency added',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              'Version: ${AppConstants.appVersion}',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
+      initialRoute: AppPages.INITIAL,
+      getPages: AppPages.routes,
+      initialBinding: BindingsBuilder(() {
+        Get.put(authController);
+      }),
     );
   }
 }

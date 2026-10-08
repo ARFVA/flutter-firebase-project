@@ -9,6 +9,29 @@
 > to later phases before the current phase passes its acceptance
 > criteria.
 
+## Document Control
+
+| Version | Date | Change Description |
+| :-: | :-: | :-- |
+| 1.0 | - | Initial draft: StudyQuest Firebase phased development plan |
+| 1.1 | 08/10/2026 | Standardized to company SOPs (coding & repository, versioning, environment/storage governance): added Section 5, branch/commit/versioning rules, repository structure, upload limits, and `/version` endpoint |
+
+## Table of Contents
+
+1. [Project Overview](#1-project-overview)
+2. [Tech Stack](#2-tech-stack)
+3. [Core Architecture Principle](#3-core-architecture-principle)
+4. [Development Rules](#4-development-rules)
+5. [Company Standards (SOP Compliance)](#5-company-standards-sop-compliance)
+6. [Phase Overview](#6-phase-overview) (Phase 0 to Phase 14 follow this section)
+7. [MVP Definition](#7-mvp-definition)
+8. [Final Target Architecture](#8-final-target-architecture)
+9. [Final Learning Outcomes](#9-final-learning-outcomes)
+10. [Devin Execution Protocol](#10-devin-execution-protocol)
+11. [Phase Completion Rule](#11-phase-completion-rule)
+12. [Success Criteria](#12-success-criteria)
+13. [Recommended Execution Order](#13-recommended-execution-order)
+
 ------------------------------------------------------------------------
 
 # 1. Project Overview
@@ -116,10 +139,229 @@ Do **not** treat Firebase services as interchangeable.
 14. Do not silently change the project scope.
 15. If a requirement conflicts with Firebase best practices, explain the
     issue before implementing the alternative.
+16. Follow the company SOPs summarized in Section 5 (naming, branching,
+    commit messages, repository structure, versioning).
+17. Never push directly to `main`. All changes go through a Merge
+    Request (Pull Request on GitHub).
+18. Update `version.json` and `CHANGELOG.md` at the final push of every
+    feature branch.
+19. Keep Staging/Dev and Production environments separated.
 
 ------------------------------------------------------------------------
 
-# 5. Phase Overview
+# 5. Company Standards (SOP Compliance)
+
+This plan follows the company SOPs listed below. If any instruction in
+this plan conflicts with an SOP, the SOP takes precedence and Devin must
+report the conflict before implementing.
+
+| SOP | Document No. | Applies to |
+| :-- | :-- | :-- |
+| Standarisasi Coding dan Repository | SOP/GRC/DEV-COD/2026/002 | Naming, Flutter standards, repository structure, branching, commits, dependencies |
+| Standard Versioning | SOP/GRC/DEV-VER/2026/001 | `version.json`, `CHANGELOG.md`, version numbering, Git tags |
+| Standarisasi Teknis & Tata Kelola Penggunaan Supabase (Draft) | SOP/GRC/DEV-SPB/2026/008 | Environment separation, feature flags, storage limits (written for Supabase; applied here to Firebase by analogy) |
+| Standarisasi: Alur Handover & Offboarding | SOP/GRC/DEV-VER/2026/009 | Not applicable to this plan (HR/GRC process for staff leaving the company) |
+
+## 5.1 Language & Naming
+
+-   All names (variables, functions, classes, files) must be in English.
+    Do not mix Indonesian and English.
+-   Use `camelCase` for variables, functions, and methods.
+-   Use `PascalCase` for classes and widgets/components.
+-   Use `snake_case` only where the framework or tool requires it:
+    Dart file/folder names, `version.json` keys, and PostgreSQL
+    table/column names.
+-   Names must be short but meaningful. Avoid unnecessary verbs.
+
+| Avoid | Prefer |
+| :-- | :-- |
+| `storeData()` / `insertData()` | `setData()` |
+| `displayData()` / `viewData()` | `getData()` |
+| `fetchUserData()` | `getUser()` |
+| `processUserData()` | `processUser()` |
+
+-   One function handles one responsibility.
+-   Avoid functions with overly long logic.
+-   Avoid magic numbers and hard-coded values.
+-   Consistency beats preference: follow the pattern already agreed in
+    the project. Change a pattern only through team discussion and code
+    review.
+
+## 5.2 Flutter Standards
+
+-   Separate UI, state, and service.
+-   Use reusable widgets.
+-   Do not put logic in the `build` method.
+-   Never store credentials in the repository; use environment
+    variables/configuration for sensitive values.
+-   Input validation is mandatory.
+
+## 5.3 Repository Structure
+
+Every repository must contain:
+
+``` text
+/docs
+README.md
+.gitignore
+.env.example
+version.json
+CHANGELOG.md
+```
+
+`README.md` must contain at minimum: project description, tech stack,
+local setup, and how to run & build.
+
+## 5.4 Branching Strategy
+
+| Branch | Purpose |
+| :-- | :-- |
+| `main` | Production |
+| `develop` | Development |
+| `feat/*` | New feature |
+| `style/*` | Appearance / UI styling |
+| `chore/*` | Installation / setup |
+| `fix/*` | Bug fix |
+| `hotfix/*` | Urgent fix |
+
+Rules:
+
+-   No direct push to `main`.
+-   All changes go through a Merge Request (Pull Request on GitHub).
+
+## 5.5 Commit Message Convention
+
+``` text
+<type>: [XX] short description
+```
+
+-   `<type>` is one of the branch prefixes above: `feat`, `style`,
+    `chore`, `fix`, `hotfix`.
+-   `[XX]` is the initials of the developer responsible for the work
+    (e.g. *John Doe* becomes `JD`).
+-   The short description is written in English and summarizes the task.
+
+Examples:
+
+``` text
+feat: [JD] add email registration
+fix: [JD] fix duplicate quest completion validation
+style: [JD] change login submit button color
+chore: [JD] bump version to 0.2.0-beta.1
+```
+
+## 5.6 Dependency Management
+
+-   Use explicit dependency versions (pin versions in `pubspec.yaml` and
+    Cloud Functions `package.json`).
+-   Update dependencies in a planned way, not randomly.
+-   Record every dependency change in the Merge Request description.
+
+## 5.7 Versioning
+
+Every repository must have `version.json` and `CHANGELOG.md` in the
+root folder.
+
+`version.json`:
+
+``` json
+{
+  "service_name": "studyquest",
+  "version": "0.1.0-beta.1",
+  "updated_at": "YYYY-MM-DD HH:MM"
+}
+```
+
+`CHANGELOG.md` follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/):
+
+``` markdown
+# Changelog
+
+All notable changes to **StudyQuest** are documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [v0.1.0-beta.1] - YYYY-MM-DD
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Fixed
+- ...
+
+### Security
+- ...
+```
+
+Numbering rules:
+
+-   Format: `vMAJOR.MINOR.PATCH-beta.ITERATION`.
+-   New feature: raise **MINOR**.
+-   Bug fix: raise **ITERATION**.
+-   `rc.x` (Release Candidate): final stage before production.
+-   `v1.0.0`: Go-Live / Production.
+-   If two developers work at the same time, the developer who merges
+    last must change the version in their own branch so it does not
+    duplicate the version already on Staging.
+
+Workflow (version is updated **once**, at the final push of a feature):
+
+1.  Raise the version number in `version.json` (current version on
+    Staging + 1).
+2.  Write the change details in `CHANGELOG.md`.
+3.  Run:
+
+``` text
+# 1. Stage the required files
+git add version.json CHANGELOG.md
+
+# 2. Commit the version bump
+git commit -m "chore: [XX] bump version to 0.1.0-beta.1"
+
+# 3. Create the official tag
+git tag -a v0.1.0-beta.1 -m "Release version 0.1.0-beta.1"
+
+# 4. Push the branch together with the tag
+git push origin <branch-name> --tags
+```
+
+Accessibility of the version:
+
+-   Flutter (mobile): `version.json` is provided in the repository root
+    and release package so QA/GRC can check it manually.
+-   Cloud Functions (backend, Phase 10): must expose `GET /version`
+    returning the content of `version.json`.
+-   `GET /version-manifest` is **not required**, because StudyQuest is a
+    single-repository project.
+
+## 5.8 Environments & Configuration
+
+Applied from SOP/GRC/DEV-SPB/2026/008 (written for Supabase) to Firebase
+by analogy.
+
+-   Use at least two physically separate Firebase projects:
+    **Staging/Dev** (daily development, integration testing, UAT) and
+    **Production** (real user data only).
+-   Never run experiments, experimental scripts, or manual schema/data
+    modifications directly in Production.
+-   Switch between environments through environment
+    variables/configuration, not by editing the main code.
+-   New backend modules/functions that need a matching change on the
+    user side must be controlled by a feature flag in `.env`. While
+    still being integrated in Production, the flag defaults to `false`.
+
+``` text
+ENABLE_<FEATURE_NAME>=false
+```
+
+-   Upload limits for Firebase Storage are defined in Phase 8.
+
+------------------------------------------------------------------------
+
+# 6. Phase Overview
 
 ``` text
 Phase 0  → Project Planning & Repository Setup
@@ -153,29 +395,53 @@ Firebase features.
 -   Create Flutter project if not already available.
 -   Initialize Git.
 -   Create initial repository structure.
--   Create `.gitignore`.
+-   Create `.gitignore` (must exclude `.env` and other secret files).
+-   Create `.env.example` (variable names only, no real values).
+-   Create `docs/` folder.
+-   Create `version.json` and `CHANGELOG.md` (initial version
+    `0.1.0-beta.1`, see Section 5.7).
 -   Define Flutter package/application identifier.
--   Define environment/configuration strategy.
+-   Define environment/configuration strategy (Staging/Dev vs
+    Production, see Section 5.8).
 -   Create initial documentation.
--   Define development branches.
+-   Define development branches (see Section 5.4).
+-   Enforce the branching rule: no direct push to `main`; all changes go
+    through a Merge Request.
 
-Recommended branches:
+Recommended branches (Section 5.4):
 
 ``` text
 main
+develop
 
-feature/firebase-setup
-feature/auth
-feature/firestore
-feature/quest-system
-feature/phone-auth
-feature/realtime-db
-feature/storage
-feature/app-check
-feature/functions
-feature/cloud-sql
-feature/security
-feature/testing
+feat/firebase-setup
+feat/auth
+feat/firestore
+feat/quest-system
+feat/phone-auth
+feat/realtime-db
+feat/storage
+feat/app-check
+feat/functions
+feat/cloud-sql
+feat/security
+feat/testing
+```
+
+Use `style/*`, `chore/*`, `fix/*`, and `hotfix/*` branches when the work
+matches those types.
+
+## Required repository root
+
+``` text
+/
+├── docs/
+├── lib/
+├── README.md
+├── .gitignore
+├── .env.example
+├── version.json
+└── CHANGELOG.md
 ```
 
 ## Recommended Flutter structure
@@ -214,6 +480,7 @@ lib/
 -   Initial README
 -   Initial architecture document
 -   Clean folder structure
+-   `.env.example`, `docs/`, `version.json`, and `CHANGELOG.md`
 
 ## Acceptance Criteria
 
@@ -221,7 +488,13 @@ lib/
 -   `flutter analyze` passes without new critical issues.
 -   Git repository is initialized.
 -   No secrets are committed.
--   README contains setup instructions.
+-   README contains project description, tech stack, local setup, and
+    run & build instructions.
+-   `.env.example`, `docs/`, `version.json`, and `CHANGELOG.md` exist in
+    the repository.
+-   `version.json` follows the format in Section 5.7.
+-   `main` and `develop` branches exist and the branching rule is
+    followed.
 
 ## Learning Checkpoint
 
@@ -231,6 +504,8 @@ Before moving on, understand:
 -   Git workflow
 -   Separation of UI, data, and services
 -   Why environment configuration matters
+-   Company naming, branching, commit, and versioning standards
+    (Section 5)
 
 ------------------------------------------------------------------------
 
@@ -242,12 +517,13 @@ Connect Flutter to Firebase correctly.
 
 ## Tasks
 
--   Create Firebase project.
+-   Create separate Firebase projects for Staging/Dev and Production
+    (see Section 5.8).
 -   Install/configure Firebase CLI.
 -   Install/configure FlutterFire CLI.
 -   Connect Flutter project to Firebase.
 -   Configure required Firebase platforms.
--   Add Firebase Core.
+-   Add Firebase Core (with an explicit dependency version).
 -   Verify Firebase initialization.
 -   Configure development environment.
 
@@ -260,6 +536,8 @@ Flutter application successfully connected to Firebase.
 -   Firebase initializes successfully.
 -   App starts without Firebase initialization errors.
 -   Firebase configuration is not manually hardcoded unnecessarily.
+-   Staging/Dev and Production use separate Firebase projects, selected
+    through configuration instead of code changes.
 -   README explains Firebase setup.
 
 ## Learning Checkpoint
@@ -523,7 +801,7 @@ The exact formula should be documented.
 A successful day means:
 
 ``` text
-dailyXP >= dailyTargetXP
+dailyXp >= dailyTargetXp
 ```
 
 If the user fails a required day:
@@ -731,7 +1009,23 @@ Firestore
 -   Avatar deletion.
 -   Quest proof upload.
 -   Store metadata in Firestore.
+-   Compress/resize images on the client before upload.
+-   Validate file size and content type (client side and Storage
+    Security Rules).
 -   Storage Security Rules.
+
+## Upload Standards
+
+Applied from SOP/GRC/DEV-SPB/2026/008 (written for Supabase Storage) to
+Firebase Storage by analogy.
+
+-   Maximum image size: **5 MB**.
+-   Compress/resize on the client before upload; the final size should
+    ideally be under **1 MB**.
+-   Allowed formats: `image/jpeg`, `image/png`, `image/webp`.
+-   Do not upload raw video files. If video is ever needed, host it on
+    an external video service and store only the reference URL in
+    Firestore.
 
 ## Acceptance Criteria
 
@@ -740,6 +1034,8 @@ Firestore
 -   User can upload quest proof.
 -   User cannot access unauthorized private files.
 -   Storage metadata is correctly associated with the user/quest.
+-   Files over 5 MB or with a disallowed content type are rejected.
+-   Uploaded images are compressed (ideally under 1 MB).
 
 ## Learning Checkpoint
 
@@ -846,6 +1142,11 @@ Create activity
 -   Functions must not blindly trust client-provided XP.
 -   Important operations should be designed to be idempotent.
 -   Errors should be safe and meaningful.
+-   Expose `GET /version` returning the content of `version.json`
+    (SOP/GRC/DEV-VER/2026/001).
+-   New functions that need a matching user-side change must be
+    controlled by a feature flag in `.env` (default `false` in Production
+    while still being integrated).
 
 ## Acceptance Criteria
 
@@ -853,6 +1154,9 @@ Create activity
 -   Duplicate completion requests do not create duplicate rewards.
 -   Business logic is documented.
 -   Functions are testable.
+-   `GET /version` returns the current `version.json` content.
+-   Newly added functions stay disabled in Production until their
+    feature flag is enabled.
 
 ## Learning Checkpoint
 
@@ -972,6 +1276,7 @@ Review and harden the entire backend.
 -   User ownership
 -   File path validation
 -   File access
+-   File size and content-type limits
 
 ### Functions
 
@@ -1052,6 +1357,7 @@ Where practical:
 -   Upload
 -   Delete
 -   Unauthorized access
+-   Oversized or disallowed file type rejected
 
 ### Functions
 
@@ -1075,12 +1381,20 @@ Where practical:
 
 ``` text
 README.md
-ARCHITECTURE.md
-FIREBASE.md
-DATABASE.md
-SECURITY.md
-DEVELOPMENT.md
+CHANGELOG.md
+version.json
+.env.example
+docs/
+├── ARCHITECTURE.md
+├── FIREBASE.md
+├── DATABASE.md
+├── SECURITY.md
+└── DEVELOPMENT.md
 ```
+
+`README.md`, `CHANGELOG.md`, `version.json`, and `.env.example` stay in
+the repository root. Detailed documentation lives in `docs/`
+(SOP/GRC/DEV-COD/2026/002).
 
 ## README.md
 
@@ -1092,8 +1406,9 @@ Must contain:
 -   Installation
 -   Firebase setup
 -   Run instructions
+-   Build instructions
 
-## ARCHITECTURE.md
+## `docs/ARCHITECTURE.md`
 
 Must contain:
 
@@ -1104,7 +1419,7 @@ Must contain:
 -   Cloud Functions
 -   PostgreSQL architecture
 
-## FIREBASE.md
+## `docs/FIREBASE.md`
 
 Must contain:
 
@@ -1117,7 +1432,7 @@ Must contain:
 -   App Check
 -   Functions
 
-## DATABASE.md
+## `docs/DATABASE.md`
 
 Must contain:
 
@@ -1127,7 +1442,7 @@ Must contain:
 -   Relationships
 -   Reasoning behind database selection
 
-## SECURITY.md
+## `docs/SECURITY.md`
 
 Must contain:
 
@@ -1139,7 +1454,7 @@ Must contain:
 -   App Check
 -   Server-side validation
 
-## DEVELOPMENT.md
+## `docs/DEVELOPMENT.md`
 
 Must contain:
 
@@ -1147,11 +1462,18 @@ Must contain:
 -   Firebase Emulator
 -   Environment configuration
 -   Development workflow
+-   Branching, commit, and versioning workflow
 -   Testing workflow
+
+## Acceptance Criteria
+
+-   All required files exist in the locations above.
+-   `CHANGELOG.md` and `version.json` reflect the final state of the project.
+-   Documentation matches the implemented architecture.
 
 ------------------------------------------------------------------------
 
-# 6. MVP Definition
+# 7. MVP Definition
 
 The MVP should be completed before advanced Firebase services are added.
 
@@ -1190,7 +1512,7 @@ Those come in later phases.
 
 ------------------------------------------------------------------------
 
-# 7. Final Target Architecture
+# 8. Final Target Architecture
 
 ``` text
                          Flutter
@@ -1237,7 +1559,7 @@ Cloud Functions
 
 ------------------------------------------------------------------------
 
-# 8. Final Learning Outcomes
+# 9. Final Learning Outcomes
 
 After completing all phases, the developer should be able to explain:
 
@@ -1311,7 +1633,7 @@ each Firebase API.
 
 ------------------------------------------------------------------------
 
-# 9. Devin Execution Protocol
+# 10. Devin Execution Protocol
 
 Devin should follow this protocol for every phase.
 
@@ -1344,6 +1666,10 @@ Implement only the current phase.
 
 Do not implement future phases unless explicitly requested.
 
+Work on a dedicated branch (`feat/*`, `fix/*`, etc.) created from
+`develop`. Write commit messages as `<type>: [XX] short description`
+(Section 5.5). Never push directly to `main`.
+
 ## Step 4 --- Test
 
 Run relevant:
@@ -1370,6 +1696,13 @@ Check:
 
 Update relevant `.md` files.
 
+At the final push of the phase (Section 5.7):
+
+-   Update `CHANGELOG.md`.
+-   Raise the version in `version.json`.
+-   Commit and create the version tag.
+-   Open a Merge Request that lists any dependency changes.
+
 ## Step 7 --- Report
 
 For every phase, report:
@@ -1377,12 +1710,17 @@ For every phase, report:
 ``` text
 Phase:
 Status:
+Branch:
+Version:
 
 Implemented:
 - ...
 - ...
 
 Files changed:
+- ...
+
+Dependency changes:
 - ...
 
 Tests:
@@ -1403,7 +1741,7 @@ Next phase:
 
 ------------------------------------------------------------------------
 
-# 10. Phase Completion Rule
+# 11. Phase Completion Rule
 
 Do not proceed automatically to the next phase if:
 
@@ -1414,12 +1752,14 @@ Do not proceed automatically to the next phase if:
 -   Secrets are exposed.
 -   Architecture is significantly different from this plan.
 -   Existing functionality has regressed.
+-   `CHANGELOG.md` / `version.json` are not updated.
+-   Changes were pushed directly to `main`.
 
 If blocked, report the blocker and explain the recommended solution.
 
 ------------------------------------------------------------------------
 
-# 11. Success Criteria
+# 12. Success Criteria
 
 The project is successful when:
 
@@ -1437,10 +1777,14 @@ The project is successful when:
 12. Documentation explains the architecture.
 13. Every Firebase service has a clear reason for existing.
 14. The developer can explain the tradeoffs between Firebase and SQL.
+15. The repository follows the company standards (naming, branching,
+    commit convention, repository structure).
+16. `version.json` and `CHANGELOG.md` are maintained and match the
+    released tags.
 
 ------------------------------------------------------------------------
 
-# 12. Recommended Execution Order
+# 13. Recommended Execution Order
 
 **Devin must execute in this exact order:**
 
