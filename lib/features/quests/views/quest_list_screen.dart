@@ -25,11 +25,24 @@ class QuestListScreen extends StatelessWidget {
         ),
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black),
-            onPressed: () {
-              Get.to(() => const CreateQuestScreen());
-            },
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Get.to(() => const CreateQuestScreen());
+              },
+              icon: const Icon(Icons.add, size: 20),
+              label: const Text('New', style: TextStyle(fontSize: 14)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
           ),
         ],
       ),

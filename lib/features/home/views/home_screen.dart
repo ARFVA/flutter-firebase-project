@@ -20,14 +20,14 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: Row(
           children: [
-            const Icon(Icons.auto_stories_rounded, color: Colors.black),
-            const SizedBox(width: 8),
+            const Icon(Icons.auto_stories_rounded, color: Colors.black, size: 28),
+            const SizedBox(width: 12),
             const Text(
               'StudyQuest',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w800,
-                fontSize: 20,
+                fontSize: 22,
               ),
             ),
           ],
@@ -47,9 +47,10 @@ class HomeScreen extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.logout, size: 20),
-            label: const Text('Sign out'),
+            label: const Text('Sign out', style: TextStyle(fontSize: 14)),
             style: TextButton.styleFrom(
               foregroundColor: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
           ),
         ],
@@ -254,6 +255,43 @@ class HomeScreen extends StatelessWidget {
                         backgroundColor: Colors.grey.shade300,
                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
                         minHeight: 8,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Level Progress',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Text(
+                            'Level ${profile.level}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: (profile.xp % 100) / 100,
+                        backgroundColor: Colors.grey.shade300,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+                        minHeight: 8,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${profile.xp % 100} / 100 XP to next level',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
