@@ -1,11 +1,14 @@
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/user_model.dart';
+import 'package:studyquest/data/models/user_profile_model.dart';
 import 'package:studyquest/data/repositories/auth_repository_impl.dart';
+import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
 
 class AuthController extends GetxController {
   final AuthRepository repository;
+  final UserProfileRepository userProfileRepository;
 
-  AuthController(this.repository);
+  AuthController(this.repository, this.userProfileRepository);
 
   // Auth state
   final Rx<UserModel?> _currentUser = Rx<UserModel?>(null);
@@ -51,12 +54,35 @@ class AuthController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
         );
       },
-      (user) {
-        _isLoading.value = false;
-        Get.snackbar(
-          'Success',
-          'Registration successful!',
-          snackPosition: SnackPosition.BOTTOM,
+      (user) async {
+        // Create user profile in Firestore
+        final profile = UserProfileModel.create(
+          uid: user.uid,
+          displayName: email.split('@')[0],
+          email: user.email ?? email,
+          photoURL: user.photoURL,
+        );
+
+        final profileResult = await userProfileRepository.createUserProfile(profile);
+
+        profileResult.fold(
+          (failure) {
+            _errorMessage.value = failure.message;
+            _isLoading.value = false;
+            Get.snackbar(
+              'Profile Creation Failed',
+              failure.message,
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          },
+          (_) {
+            _isLoading.value = false;
+            Get.snackbar(
+              'Success',
+              'Registration successful!',
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          },
         );
       },
     );

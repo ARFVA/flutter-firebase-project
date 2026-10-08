@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'core/constants/app_constants.dart';
 import 'routes/app_pages.dart';
 import 'data/datasources/auth_datasource.dart';
+import 'data/datasources/firestore_datasource.dart';
 import 'data/repositories/auth_repository_impl.dart';
+import 'data/repositories/user_profile_repository_impl.dart';
 import 'features/auth/controllers/auth_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -24,7 +27,11 @@ void main() async {
   // Initialize dependencies
   final authRemoteDataSource = AuthRemoteDataSourceImpl(FirebaseAuth.instance);
   final authRepository = AuthRepositoryImpl(authRemoteDataSource);
-  final authController = AuthController(authRepository);
+
+  final firestoreRemoteDataSource = FirestoreRemoteDataSourceImpl(FirebaseFirestore.instance);
+  final userProfileRepository = UserProfileRepositoryImpl(firestoreRemoteDataSource);
+
+  final authController = AuthController(authRepository, userProfileRepository);
 
   runApp(StudyQuestApp(authController: authController));
 }

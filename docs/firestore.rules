@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection
+    match /users/{userId} {
+      // Allow read/write if user is the owner
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Quests collection
+    match /quests/{questId} {
+      // Allow read/write if user owns the quest
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Allow create if user is authenticated and setting their own userId
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Activities collection
+    match /activities/{activityId} {
+      // Allow read/write if user owns the activity
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Allow create if user is authenticated and setting their own userId
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Achievements collection (read-only for all authenticated users)
+    match /achievements/{achievementId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only server can write
+    }
+
+    // User achievements collection
+    match /user_achievements/{userAchievementId} {
+      // Allow read/write if user owns the achievement
+      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      
+      // Allow create if user is authenticated and setting their own userId
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}
