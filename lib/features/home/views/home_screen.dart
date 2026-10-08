@@ -211,35 +211,35 @@ class HomeScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                        width: 100,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.star, color: Colors.black, size: 24),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${profile.xp}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
+                          width: 100,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.star, color: Colors.black, size: 24),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${profile.xp}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            const Text(
-                              'Total XP',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                              const Text(
+                                'Total XP',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                       const SizedBox(width: 12),
                       Container(
                         width: 100,
