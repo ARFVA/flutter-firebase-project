@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/quest_model.dart';
 import 'package:studyquest/data/models/activity_model.dart';

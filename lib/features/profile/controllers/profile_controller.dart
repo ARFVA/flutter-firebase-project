@@ -73,4 +73,25 @@ class ProfileController extends GetxController {
       },
     );
   }
+
+  Future<void> updateUserProfile(UserProfileModel profile) async {
+    _isLoading.value = true;
+
+    final result = await repository.updateUserProfile(profile);
+
+    result.fold(
+      (failure) {
+        _isLoading.value = false;
+        Get.snackbar(
+          'Error',
+          failure.message,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+      (_) {
+        _profile.value = profile;
+        _isLoading.value = false;
+      },
+    );
+  }
 }
