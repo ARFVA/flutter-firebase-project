@@ -1,177 +1,188 @@
-# StudyQuest
+# StudyQuest - Firebase Learning Project
 
-A gamified study tracking application built with Flutter and Firebase.
+A comprehensive Flutter application demonstrating Firebase integration with best practices for authentication, database management, real-time features, and cloud storage.
 
-## Project Overview
+## 🚀 Features
 
-StudyQuest is a productivity and study-tracking application based on gamification. Users can:
+### Authentication
+- Email/Password authentication
+- Phone number authentication with OTP
+- Session management
+- Protected routes
 
-- Register and log in
-- Use phone number authentication
-- Create and complete quests
-- Earn XP and level up
-- Maintain daily streaks
-- Track activity history
-- Join realtime study rooms
-- Upload profile pictures and quest proofs
+### User Profile
+- Profile creation and management
+- XP and level system
+- Daily targets
+- Streak tracking
+- Activity history
 
-## Tech Stack
+### Quest System
+- Create, read, update, delete quests
+- Checklist and timer quest types
+- Quest completion tracking
+- XP rewards
 
-### Frontend
-- Flutter
-- Dart
-- GetX (State Management)
-- Responsive UI
-- Android-first (Flutter Web compatible)
+### Real-time Study Rooms
+- Create and join study rooms
+- Real-time presence tracking
+- Status updates (studying/break/offline)
+- Participant management
 
-### Firebase
-- Firebase Authentication
-- Firebase App Check
-- Cloud Firestore
-- Firebase Realtime Database
-- Firebase Storage
-- Cloud Functions
-- Firebase Emulator Suite
+### Gamification
+- XP calculation on quest completion
+- Level progression
+- Daily target tracking
+- Streak system
+- Activity history
 
-### SQL
-- Cloud SQL PostgreSQL
+## 📦 Architecture
 
-### Development
-- Firebase CLI
-- FlutterFire CLI
-- Git
-- GitHub
-
-## Project Structure
+The project follows Clean Architecture principles:
 
 ```
 lib/
 ├── core/
 │   ├── constants/
 │   ├── errors/
-│   ├── services/
 │   └── utils/
-│
 ├── data/
-│   ├── datasources/
 │   ├── models/
+│   ├── datasources/
 │   └── repositories/
-│
 ├── features/
 │   ├── auth/
 │   ├── home/
 │   ├── quests/
 │   ├── profile/
-│   ├── achievements/
-│   ├── activity/
 │   └── study_room/
-│
-├── routes/
-│
-└── main.dart
+└── routes/
 ```
 
-## Development Phases
+## 🔧 Technologies
 
-This project follows a phased development approach. See [StudyQuest_Firebase_Phased_Development_Plan.md](StudyQuest_Firebase_Phased_Development_Plan.md) for detailed phase information.
+- **Flutter**: Cross-platform UI framework
+- **GetX**: State management and routing
+- **Firebase Core**: Firebase initialization
+- **Firebase Auth**: Authentication
+- **Cloud Firestore**: NoSQL database
+- **Firebase Realtime Database**: Real-time data sync
+- **Firebase Storage**: File storage
+- **Firebase App Check**: App integrity
+- **Dartz**: Functional programming utilities
 
-- Phase 0: Project Planning & Repository Setup ✅
-- Phase 1: Firebase Setup & Flutter Integration ⏳ (Firebase Core added, user setup required)
-- Phase 2: Email/Password Authentication
-- Phase 3: User Profile & Firestore Foundation
-- Phase 4: Quest System
-- Phase 5: XP, Level, Streak & Activity
-- Phase 6: Phone Number Authentication
-- Phase 7: Realtime Study Room
-- Phase 8: Firebase Storage
-- Phase 9: Firebase App Check
-- Phase 10: Cloud Functions
-- Phase 11: Cloud SQL PostgreSQL
-- Phase 12: Security Hardening
-- Phase 13: Testing & Emulator Suite
-- Phase 14: Documentation & Final Review
+## 📋 Firebase Services
 
-## Getting Started
+### Firestore Collections
+- `users`: User profiles
+- `quests`: User quests
+- `activities`: Activity history
+- `achievements`: Achievement definitions
+- `user_achievements`: User achievements
+
+### Realtime Database Structure
+- `rooms/{roomId}`: Study rooms
+- `rooms/{roomId}/participants/{userId}`: Room participants
+
+### Storage Buckets
+- `users/{userId}/`: User profile pictures
+- `quests/{questId}/`: Quest attachments
+
+## 🔐 Security
+
+### Implemented
+- Firestore Security Rules
+- Realtime Database Security Rules
+- Firebase Storage Security Rules
+- Firebase App Check
+- Protected routes
+- Input validation
+
+### Planned
+- Cloud Functions for critical logic
+- Rate limiting
+- Server-side validation
+- Secrets management
+
+## 🧪 Testing
+
+```bash
+# Run unit tests
+flutter test
+
+# Run widget tests
+flutter test test/widget_test.dart
+
+# Static analysis
+flutter analyze
+```
+
+## 📝 Development Phases
+
+The project is developed in phases following the [Phased Development Plan](StudyQuest_Firebase_Phased_Development_Plan.md):
+
+- ✅ Phase 0: Project Planning & Repository Setup
+- ✅ Phase 1: Firebase Setup & Flutter Integration
+- ✅ Phase 2: Email/Password Authentication
+- ✅ Phase 3: User Profile & Firestore Foundation
+- ✅ Phase 4: Quest System
+- ✅ Phase 5: XP, Level, Streak & Activity
+- ✅ Phase 6: Phone Number Authentication
+- ✅ Phase 7: Realtime Study Room
+- ✅ Phase 8: Firebase Storage
+- ✅ Phase 9: Firebase App Check
+- ✅ Phase 10: Cloud Functions (Documentation)
+- ✅ Phase 11: Cloud SQL PostgreSQL (Documentation)
+- ✅ Phase 12: Security Hardening (Documentation)
+- ✅ Phase 13: Testing & Emulator Suite (Documentation)
+- ✅ Phase 14: Documentation (In Progress)
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- Flutter SDK (3.11.5 or higher)
-- Dart SDK
+- Flutter SDK (>= 3.11.5)
 - Firebase CLI
-- FlutterFire CLI
-- Android Studio / VS Code
-- Git
+- Firebase project
 
-### Installation
+### Setup
 
-1. Clone the repository:
+1. Clone the repository
 ```bash
 git clone <repository-url>
 cd flutter-with-firebase-project
 ```
 
-2. Install dependencies:
+2. Install dependencies
 ```bash
 flutter pub get
 ```
 
-3. Run the app:
+3. Configure Firebase
+```bash
+flutterfire configure
+```
+
+4. Run the app
 ```bash
 flutter run
 ```
 
-### Firebase Setup
+## 📄 Documentation
 
-Firebase setup will be completed in Phase 1. This includes:
-- Creating a Firebase project
-- Configuring Firebase CLI
-- Connecting Flutter to Firebase
-- Setting up required Firebase platforms
+- [Architecture](docs/ARCHITECTURE.md)
+- [Database](docs/DATABASE.md)
+- [Firebase Setup](docs/FIREBASE.md)
+- [Security](docs/SECURITY.md)
+- [Development](docs/DEVELOPMENT.md)
+- [Cloud Functions](docs/CLOUD_FUNCTIONS.md)
+- [Cloud SQL](docs/CLOUD_SQL.md)
+- [Security Hardening](docs/SECURITY_HARDENING.md)
+- [Testing](docs/TESTING.md)
 
-## Development Branches
+## 📄 License
 
-Recommended branches for development:
-- `main` - Production code
-- `feature/firebase-setup` - Firebase integration
-- `feature/auth` - Authentication features
-- `feature/firestore` - Firestore integration
-- `feature/quest-system` - Quest functionality
-- `feature/phone-auth` - Phone authentication
-- `feature/realtime-db` - Realtime database
-- `feature/storage` - Firebase Storage
-- `feature/app-check` - App Check integration
-- `feature/functions` - Cloud Functions
-- `feature/cloud-sql` - PostgreSQL integration
-- `feature/security` - Security hardening
-- `feature/testing` - Testing implementation
+This project is for learning purposes.
 
-## Documentation
+## 🤝 Contributing
 
-- [Phased Development Plan](StudyQuest_Firebase_Phased_Development_Plan.md)
-- [Architecture Documentation](ARCHITECTURE.md) (To be created)
-- [Firebase Setup Guide](FIREBASE.md) (To be created)
-- [Database Schema](DATABASE.md) (To be created)
-- [Security Guidelines](SECURITY.md) (To be created)
-- [Development Guide](DEVELOPMENT.md) (To be created)
-
-## Learning Objectives
-
-This project is designed to teach:
-1. Firebase Authentication
-2. Firebase Phone Authentication
-3. Firebase App Check
-4. Cloud Firestore
-5. Firebase Realtime Database
-6. Firebase Storage
-7. Cloud Functions
-8. Cloud SQL PostgreSQL
-9. Firebase Security Rules
-10. Firebase Emulator Suite
-
-## Contributing
-
-This is a learning project. Follow the phased development plan and implement one phase at a time.
-
-## License
-
-This project is for educational purposes.
+This is a learning project. Contributions are welcome but please follow the existing code style and architecture.

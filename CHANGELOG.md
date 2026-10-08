@@ -3,6 +3,47 @@
 All notable changes to **StudyQuest** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.0-beta.1] - 2026-10-08
+
+### Added
+- Firebase Storage dependency and integration
+- Firebase App Check for app integrity
+- StorageRemoteDataSource for file operations
+- StorageRepository with clean architecture
+- Firebase Storage security rules
+- Cloud Functions documentation and implementation
+- Cloud SQL PostgreSQL documentation
+- Security hardening documentation
+- Testing and emulator suite documentation
+- Updated README with comprehensive project info
+- Cloud Functions for server-side logic (onQuestComplete, onUserCreated, dailyStreakCheck)
+- Cloud Functions package.json configuration
+
+### Changed
+- Updated main.dart to initialize Firebase Storage and App Check
+- Updated home screen to reflect Phase 8 completion
+- Added functions/ directory for Cloud Functions
+
+### Security
+- Firebase Storage security rules for user and quest files
+- Firebase App Check integration (debug provider for development)
+- Comprehensive security documentation
+- Cloud Functions for critical server-side logic
+
+### Documentation
+- Complete project documentation in docs/
+- Cloud Functions implementation guide
+- Cloud SQL PostgreSQL architecture
+- Security hardening guidelines
+- Testing and emulator suite setup
+- Updated README with full feature list
+
+### Architecture
+- Cloud Functions for XP calculation
+- Cloud Functions for user profile creation
+- Cloud Functions for daily streak checks
+- Server-side validation architecture documented
+
 ## [0.6.0-beta.1] - 2026-10-08
 
 ### Added

@@ -182,7 +182,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const Text(
-                        'Phase 5: Gamification System',
+                        'Phase 8: Firebase & Storage',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -190,7 +190,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Complete quests to earn XP and level up!',
+                        'Complete study features with Firebase services!',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
                       ),
