@@ -240,69 +240,70 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                      const SizedBox(width: 12),
-                      Container(
-                        width: 100,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.emoji_events, color: Colors.black, size: 24),
-                            const SizedBox(height: 8),
-                            Text(
-                              'L${profile.level}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 100,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.emoji_events, color: Colors.black, size: 24),
+                              const SizedBox(height: 8),
+                              Text(
+                                'L${profile.level}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            const Text(
-                              'Level',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                              const Text(
+                                'Level',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        width: 100,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.local_fire_department, color: Colors.black, size: 24),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${profile.streak}',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.black,
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 100,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              const Icon(Icons.local_fire_department, color: Colors.black, size: 24),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${profile.streak}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            const Text(
-                              'Streak',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
+                              const Text(
+                                'Streak',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
