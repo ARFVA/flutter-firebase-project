@@ -86,11 +86,20 @@ class ProfileController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
         _profile.value = profile;
         _isLoading.value = false;
+        Get.snackbar(
+          'Success',
+          'Profile updated!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
+        );
       },
     );
   }

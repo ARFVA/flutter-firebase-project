@@ -30,22 +30,33 @@ class HomeScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (nameController.text.trim().isNotEmpty) {
                 Get.back();
+                
                 // Update display name in Firebase Auth
                 final firebaseUser = FirebaseAuth.instance.currentUser;
                 if (firebaseUser != null) {
-                  firebaseUser.updateDisplayName(nameController.text.trim());
+                  await firebaseUser.updateDisplayName(nameController.text.trim());
                 }
+                
                 // Update profile name in Firestore
                 if (profile != null) {
                   final updatedProfile = profile.copyWith(
                     displayName: nameController.text.trim(),
                     updatedAt: DateTime.now(),
                   );
-                  profileController.updateUserProfile(updatedProfile);
+                  await profileController.updateUserProfile(updatedProfile);
                 }
+                
+                // Show success message
+                Get.snackbar(
+                  'Success',
+                  'Display name updated!',
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green.shade700,
+                  colorText: Colors.white,
+                );
               }
             },
             style: ElevatedButton.styleFrom(
