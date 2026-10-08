@@ -202,12 +202,11 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ],
-              const SizedBox(height: 32),
-              
-              // Stats
-              if (profile != null) ...[
-                SingleChildScrollView(
+                const SizedBox(height: 32),
+
+                // Stats
+                if (profile != null) ...[
+                  SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
@@ -473,7 +472,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
+              ],
             ],
           ),
         );
