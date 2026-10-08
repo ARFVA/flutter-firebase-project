@@ -306,7 +306,6 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
                 Container(
                   padding: const EdgeInsets.all(20),
