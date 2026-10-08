@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _showEditNameDialog(UserProfileModel? profile, dynamic user, ProfileController profileController) {
+  void _showEditNameDialog(UserProfileModel? profile, dynamic user, ProfileController profileController, AuthController authController) {
     final nameController = TextEditingController(text: user.displayName ?? '');
 
     Get.dialog(
@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
                   // Reload user to get updated display name
                   await firebaseUser.reload();
                 }
-                
+
                 // Update profile name in Firestore
                 if (profile != null) {
                   final updatedProfile = profile.copyWith(
@@ -48,16 +48,16 @@ class HomeScreen extends StatelessWidget {
                   );
                   await profileController.updateUserProfile(updatedProfile);
                 }
-                
+
                 // Refresh auth controller to update user data
                 await authController.refreshCurrentUser();
-                
+
                 // Reload profile data
                 await profileController.loadProfile();
-                
+
                 // Close dialog
                 Get.back();
-                
+
                 // Show success message
                 Get.snackbar(
                   'Success',
@@ -169,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                _showEditNameDialog(profile, user, profileController);
+                                _showEditNameDialog(profile, user, profileController, authController);
                               },
                               child: Row(
                                 children: [
@@ -379,16 +379,6 @@ class HomeScreen extends StatelessWidget {
                           fontSize: 14,
                           color: Colors.grey.shade600,
                           fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${profile.xp % 100} / 100 XP to next level',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
                         ),
                       ),
                     ],

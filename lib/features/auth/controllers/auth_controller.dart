@@ -4,6 +4,7 @@ import 'package:studyquest/data/models/user_model.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
 import 'package:studyquest/data/repositories/auth_repository_impl.dart';
 import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthController extends GetxController {
   final AuthRepository repository;
@@ -209,10 +210,10 @@ class AuthController extends GetxController {
   }
 
   Future<void> refreshCurrentUser() async {
-    final user = repository.currentUser;
-    if (user != null) {
-      await user.reload();
-      _currentUser.value = repository.currentUser;
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null) {
+      await firebaseUser.reload();
+      _currentUser.value = UserModel.fromFirebaseUser(firebaseUser);
     }
   }
 
