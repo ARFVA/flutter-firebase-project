@@ -32,12 +32,12 @@ class HomeScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               if (nameController.text.trim().isNotEmpty) {
-                Get.back();
-                
                 // Update display name in Firebase Auth
                 final firebaseUser = FirebaseAuth.instance.currentUser;
                 if (firebaseUser != null) {
                   await firebaseUser.updateDisplayName(nameController.text.trim());
+                  // Reload user to get updated display name
+                  await firebaseUser.reload();
                 }
                 
                 // Update profile name in Firestore
@@ -48,6 +48,15 @@ class HomeScreen extends StatelessWidget {
                   );
                   await profileController.updateUserProfile(updatedProfile);
                 }
+                
+                // Refresh auth controller to update user data
+                await authController.refreshCurrentUser();
+                
+                // Reload profile data
+                await profileController.loadProfile();
+                
+                // Close dialog
+                Get.back();
                 
                 // Show success message
                 Get.snackbar(
@@ -125,44 +134,46 @@ class HomeScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // User info header
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Colors.blue.shade700,
-                      child: Text(
-                        user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
-                        style: const TextStyle(
-                          fontSize: 28,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+        return RefreshIndicator(
+          onRefresh: () => profileController.loadProfile(),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // User info header
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.blue.shade700,
+                        child: Text(
+                          user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              _showEditNameDialog(profile, user, profileController);
-                            },
-                            child: Row(
-                              children: [
-                                Expanded(
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _showEditNameDialog(profile, user, profileController);
+                              },
+                              child: Row(
+                                children: [
+                                  Expanded(
                                   child: Text(
                                     user.displayName ?? user.email ?? 'User',
                                     style: const TextStyle(
@@ -189,9 +200,8 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
               const SizedBox(height: 32),
               
               // Stats
@@ -360,6 +370,17 @@ class HomeScreen extends StatelessWidget {
                         value: (profile.xp % 100) / 100,
                         backgroundColor: Colors.grey.shade300,
                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+                        minHeight: 8,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${profile.xp % 100}/100 XP to next level',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                         minHeight: 8,
                       ),
                       const SizedBox(height: 8),

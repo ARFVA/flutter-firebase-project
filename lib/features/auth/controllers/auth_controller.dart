@@ -208,6 +208,14 @@ class AuthController extends GetxController {
     _errorMessage.value = '';
   }
 
+  Future<void> refreshCurrentUser() async {
+    final user = repository.currentUser;
+    if (user != null) {
+      await user.reload();
+      _currentUser.value = repository.currentUser;
+    }
+  }
+
   Future<void> sendOtp(String phoneNumber) async {
     _isLoading.value = true;
     _errorMessage.value = '';
