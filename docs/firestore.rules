@@ -10,11 +10,22 @@ service cloud.firestore {
 
     // Quests collection
     match /quests/{questId} {
-      // Allow read/write if user owns the quest
-      allow read, write: if request.auth != null && resource.data.userId == request.auth.uid;
+      // Allow read if user owns the quest
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       
       // Allow create if user is authenticated and setting their own userId
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null 
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.isCompleted == false;
+      
+      // Allow update if user owns the quest
+      // Prevent changing userId or isCompleted without proper validation
+      allow update: if request.auth != null 
+                    && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == resource.data.userId;
+      
+      // Allow delete if user owns the quest
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // Activities collection

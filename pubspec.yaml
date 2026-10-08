@@ -41,6 +41,9 @@ dependencies:
   # Functional Programming
   dartz: ^0.10.1
 
+  # UUID generation
+  uuid: ^4.5.1
+
   # Firebase
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1

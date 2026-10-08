@@ -3,6 +3,30 @@
 All notable changes to **StudyQuest** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.0-beta.1] - 2026-10-08
+
+### Added
+- Quest system with CRUD operations
+- QuestModel with support for checklist and timer quest types
+- QuestRemoteDataSource for Firestore operations
+- QuestRepository with clean architecture
+- QuestController with GetX state management
+- QuestListScreen with active/completed tabs
+- CreateQuestScreen with form validation
+- Quest completion functionality
+- UUID dependency for unique quest IDs
+- Routing for quest screens
+- Quest integration in home screen
+- Enhanced Firestore Security Rules for quests
+
+### Changed
+- Updated main.dart to initialize quest dependencies
+- Updated firestore.rules with quest-specific security rules
+- Improved security rules to prevent unauthorized quest modifications
+
+### Fixed
+- TabBar dynamic text rendering issue
+
 ## [0.2.0-beta.1] - 2026-10-08
 
 ### Added

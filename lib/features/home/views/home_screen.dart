@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -74,24 +75,34 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 48),
-              const Card(
-                margin: EdgeInsets.symmetric(horizontal: 32),
+              Card(
+                margin: const EdgeInsets.symmetric(horizontal: 32),
                 child: Padding(
-                  padding: EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
-                      Text(
-                        'Phase 2: Authentication Complete',
+                      const Text(
+                        'Phase 4: Quest System',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Email/Password authentication is working!',
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Create and complete your study quests!',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () => Get.to(() => const QuestListScreen()),
+                        icon: const Icon(Icons.assignment),
+                        label: const Text('View Quests'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                     ],
                   ),

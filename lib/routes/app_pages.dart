@@ -4,6 +4,8 @@ import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/auth/views/login_screen.dart';
 import 'package:studyquest/features/auth/views/register_screen.dart';
 import 'package:studyquest/features/home/views/home_screen.dart';
+import 'package:studyquest/features/quests/views/quest_list_screen.dart';
+import 'package:studyquest/features/quests/views/create_quest_screen.dart';
 
 part 'app_routes.dart';
 
@@ -22,6 +24,16 @@ class AppPages {
     GetPage(
       name: Routes.HOME,
       page: () => const HomeScreen(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.QUESTS,
+      page: () => const QuestListScreen(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.CREATE_QUEST,
+      page: () => const CreateQuestScreen(),
       middlewares: [AuthMiddleware()],
     ),
   ];
