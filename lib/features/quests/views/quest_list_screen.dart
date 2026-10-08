@@ -12,13 +12,21 @@ class QuestListScreen extends StatelessWidget {
     final questController = Get.find<QuestController>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('My Quests'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'My Quests',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add, color: Colors.black),
             onPressed: () {
               Get.to(() => const CreateQuestScreen());
             },
@@ -39,17 +47,36 @@ class QuestListScreen extends StatelessWidget {
                 Icon(
                   Icons.assignment_outlined,
                   size: 80,
-                  color: Colors.grey[400],
+                  color: Colors.grey.shade300,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
                 const Text(
                   'No quests yet',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton(
+                const Text(
+                  'Create your first quest to start earning XP!',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
                   onPressed: () => Get.to(() => const CreateQuestScreen()),
-                  child: const Text('Create Your First Quest'),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create Quest'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                  ),
                 ),
               ],
             ),
@@ -60,14 +87,19 @@ class QuestListScreen extends StatelessWidget {
           length: 2,
           child: Column(
             children: [
-              Obx(() => TabBar(
-                labelColor: Colors.deepPurple,
+              TabBar(
+                labelColor: Colors.grey,
                 unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.black,
                 tabs: [
-                  Tab(text: 'Active (${questController.activeQuests.length})'),
-                  Tab(text: 'Completed (${questController.completedQuests.length})'),
+                  Tab(
+                    text: 'Active (${questController.activeQuests.length})',
+                  ),
+                  Tab(
+                    text: 'Completed (${questController.completedQuests.length})',
+                  ),
                 ],
-              )),
+              ),
               Expanded(
                 child: TabBarView(
                   children: [
@@ -86,9 +118,23 @@ class QuestListScreen extends StatelessWidget {
   Widget _buildQuestList(List<QuestModel> quests, QuestController controller) {
     if (quests.isEmpty) {
       return Center(
-        child: Text(
-          'No quests in this category',
-          style: TextStyle(color: Colors.grey[600]),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              size: 64,
+              color: Colors.grey.shade300,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No quests in this category',
+              style: TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -104,44 +150,75 @@ class QuestListScreen extends StatelessWidget {
   }
 
   Widget _buildQuestCard(QuestModel quest, QuestController controller) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: quest.isCompleted ? Colors.green : Colors.deepPurple,
+        contentPadding: const EdgeInsets.all(16),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: quest.isCompleted ? Colors.grey.shade100 : Colors.black,
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Icon(
             quest.type == 'timer' ? Icons.timer : Icons.checklist,
-            color: Colors.white,
+            color: quest.isCompleted ? Colors.grey : Colors.white,
           ),
         ),
         title: Text(
           quest.title,
           style: TextStyle(
+            fontWeight: FontWeight.w600,
             decoration: quest.isCompleted ? TextDecoration.lineThrough : null,
+            color: Colors.black,
           ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(quest.description),
-            const SizedBox(height: 4),
+            Text(
+              quest.description,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.star, size: 16, color: Colors.amber),
+                const Icon(Icons.star, size: 16, color: Colors.black),
                 const SizedBox(width: 4),
-                Text('${quest.xp} XP'),
+                Text(
+                  '${quest.xp} XP',
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
                 if (quest.durationMinutes != null) ...[
                   const SizedBox(width: 16),
                   const Icon(Icons.access_time, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text('${quest.durationMinutes} min'),
+                  Text(
+                    '${quest.durationMinutes} min',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
                 ],
               ],
             ),
           ],
         ),
         trailing: quest.isCompleted
-            ? const Icon(Icons.check_circle, color: Colors.green)
+            ? const Icon(Icons.check_circle, color: Colors.grey)
             : IconButton(
                 icon: const Icon(Icons.check_circle_outline),
                 onPressed: () {
