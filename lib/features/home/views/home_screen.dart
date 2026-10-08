@@ -190,18 +190,18 @@ class HomeScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                          ),
-                          Text(
-                            user.email ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
+                            Text(
+                              user.email ?? '',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 32),
 
