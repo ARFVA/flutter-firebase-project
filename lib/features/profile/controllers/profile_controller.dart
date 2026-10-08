@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
 import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
