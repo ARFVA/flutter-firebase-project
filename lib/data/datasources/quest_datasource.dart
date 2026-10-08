@@ -41,12 +41,16 @@ class QuestRemoteDataSourceImpl implements QuestRemoteDataSource {
       final snapshot = await firestore
           .collection(FirebaseConstants.questsCollection)
           .where('userId', isEqualTo: userId)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      final quests = snapshot.docs
           .map((doc) => QuestModel.fromMap(doc.data()))
           .toList();
+
+      // Sort locally instead of using orderBy to avoid index requirement
+      quests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      return quests;
     } on FirebaseException catch (e) {
       throw ServerException('Firestore error: ${e.message}');
     } catch (e) {
@@ -127,12 +131,16 @@ class QuestRemoteDataSourceImpl implements QuestRemoteDataSource {
           .collection(FirebaseConstants.questsCollection)
           .where('userId', isEqualTo: userId)
           .where('isCompleted', isEqualTo: false)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      final quests = snapshot.docs
           .map((doc) => QuestModel.fromMap(doc.data()))
           .toList();
+
+      // Sort locally instead of using orderBy to avoid index requirement
+      quests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      
+      return quests;
     } on FirebaseException catch (e) {
       throw ServerException('Firestore error: ${e.message}');
     } catch (e) {
@@ -147,12 +155,21 @@ class QuestRemoteDataSourceImpl implements QuestRemoteDataSource {
           .collection(FirebaseConstants.questsCollection)
           .where('userId', isEqualTo: userId)
           .where('isCompleted', isEqualTo: true)
-          .orderBy('completedAt', descending: true)
           .get();
 
-      return snapshot.docs
+      final quests = snapshot.docs
           .map((doc) => QuestModel.fromMap(doc.data()))
           .toList();
+
+      // Sort locally instead of using orderBy to avoid index requirement
+      quests.sort((a, b) {
+        if (a.completedAt != null && b.completedAt != null) {
+          return b.completedAt!.compareTo(a.completedAt!);
+        }
+        return b.createdAt.compareTo(a.createdAt);
+      });
+      
+      return quests;
     } on FirebaseException catch (e) {
       throw ServerException('Firestore error: ${e.message}');
     } catch (e) {
