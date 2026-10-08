@@ -185,9 +185,10 @@ class HomeScreen extends StatelessWidget {
                                       maxLines: 1,
                                     ),
                                   ),
-                                const SizedBox(width: 4),
-                                Icon(Icons.edit, size: 16, color: Colors.grey),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Icon(Icons.edit, size: 16, color: Colors.grey),
+                                ],
+                              ),
                             ),
                           ),
                           Text(
