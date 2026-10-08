@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'core/constants/app_constants.dart';
 import 'routes/app_pages.dart';
@@ -12,13 +11,11 @@ import 'data/datasources/firestore_datasource.dart';
 import 'data/datasources/quest_datasource.dart';
 import 'data/datasources/activity_datasource.dart';
 import 'data/datasources/realtime_db_datasource.dart';
-import 'data/datasources/storage_datasource.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/user_profile_repository_impl.dart';
 import 'data/repositories/quest_repository_impl.dart';
 import 'data/repositories/activity_repository_impl.dart';
 import 'data/repositories/room_repository_impl.dart';
-import 'data/repositories/storage_repository_impl.dart';
 import 'features/auth/controllers/auth_controller.dart';
 import 'features/quests/controllers/quest_controller.dart';
 import 'features/profile/controllers/profile_controller.dart';
@@ -37,7 +34,6 @@ void main() async {
     // Initialize Firebase App Check (debug provider for development)
     try {
       await FirebaseAppCheck.instance.activate(
-        webRecaptchaProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
         androidProvider: AndroidProvider.debug,
         appleProvider: AppleProvider.debug,
       );
@@ -64,9 +60,6 @@ void main() async {
 
   final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(FirebaseDatabase.instance);
   final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
-
-  final storageRemoteDataSource = StorageRemoteDataSourceImpl(FirebaseStorage.instance);
-  final storageRepository = StorageRepositoryImpl(storageRemoteDataSource);
 
   final authController = AuthController(authRepository, userProfileRepository);
   final questController = QuestController(
