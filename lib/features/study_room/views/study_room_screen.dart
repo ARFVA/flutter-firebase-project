@@ -11,13 +11,24 @@ class StudyRoomScreen extends StatelessWidget {
     final roomController = Get.find<RoomController>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Study Room'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Study Room',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           Obx(() => PopupMenuButton<String>(
-            icon: Icon(roomController.currentStatus == 'studying' ? Icons.book : Icons.coffee),
+            icon: Icon(
+              roomController.currentStatus == 'studying' ? Icons.book : Icons.coffee,
+              color: Colors.black,
+            ),
             onSelected: (status) {
               roomController.updateStatus(status);
             },
@@ -45,7 +56,7 @@ class StudyRoomScreen extends StatelessWidget {
             ],
           )),
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app, color: Colors.black),
             onPressed: () {
               Get.defaultDialog(
                 title: 'Leave Room',
@@ -70,24 +81,64 @@ class StudyRoomScreen extends StatelessWidget {
                 Icon(
                   Icons.meeting_room,
                   size: 80,
-                  color: Colors.grey[400],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'No active room',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  color: Colors.grey.shade300,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () => _showCreateRoomDialog(roomController),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create Room'),
+                const Text(
+                  'No active room',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 8),
-                ElevatedButton.icon(
-                  onPressed: () => _showJoinRoomDialog(roomController),
-                  icon: const Icon(Icons.login),
-                  label: const Text('Join Room'),
+                const Text(
+                  'Create or join a study room to study together',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () => _showCreateRoomDialog(roomController),
+                      icon: const Icon(Icons.add, size: 20),
+                      label: const Text('Create Room'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        side: const BorderSide(color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    OutlinedButton.icon(
+                      onPressed: () => _showJoinRoomDialog(roomController),
+                      icon: const Icon(Icons.login, size: 20),
+                      label: const Text('Join Room'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        side: const BorderSide(color: Colors.black),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -140,18 +191,45 @@ class StudyRoomScreen extends StatelessWidget {
         statusColor = Colors.grey;
     }
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: ListTile(
+        contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
           backgroundColor: statusColor.withValues(alpha: 0.2),
           child: Icon(statusIcon, color: statusColor),
         ),
-        title: Text(participant.displayName),
-        subtitle: Text(participant.status.toUpperCase()),
-        trailing: Text(
-          _formatTime(participant.lastSeen),
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
+        title: Text(
+          participant.displayName,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              participant.status.toUpperCase(),
+              style: TextStyle(
+                color: statusColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              _formatTime(participant.lastSeen),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -183,6 +261,7 @@ class StudyRoomScreen extends StatelessWidget {
           decoration: const InputDecoration(
             labelText: 'Room Name',
             hintText: 'Firebase Study Room',
+            border: OutlineInputBorder(),
           ),
         ),
         actions: [
@@ -197,6 +276,10 @@ class StudyRoomScreen extends StatelessWidget {
                 controller.createRoom(roomNameController.text.trim());
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Create'),
           ),
         ],
@@ -215,6 +298,7 @@ class StudyRoomScreen extends StatelessWidget {
           decoration: const InputDecoration(
             labelText: 'Room ID',
             hintText: 'Enter room ID',
+            border: OutlineInputBorder(),
           ),
         ),
         actions: [
@@ -229,6 +313,10 @@ class StudyRoomScreen extends StatelessWidget {
                 controller.joinRoom(roomIdController.text.trim());
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Join'),
           ),
         ],
