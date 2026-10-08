@@ -7,6 +7,6 @@ void main() {
     await tester.pumpWidget(const StudyQuestApp());
 
     expect(find.text('Welcome to StudyQuest'), findsOneWidget);
-    expect(find.text('Phase 0: Project Setup Complete'), findsOneWidget);
+    expect(find.text('Phase 1: Firebase Setup In Progress'), findsOneWidget);
   });
 }

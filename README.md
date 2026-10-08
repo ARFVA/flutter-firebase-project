@@ -76,7 +76,7 @@ lib/
 This project follows a phased development approach. See [StudyQuest_Firebase_Phased_Development_Plan.md](StudyQuest_Firebase_Phased_Development_Plan.md) for detailed phase information.
 
 - Phase 0: Project Planning & Repository Setup ✅
-- Phase 1: Firebase Setup & Flutter Integration
+- Phase 1: Firebase Setup & Flutter Integration ⏳ (Firebase Core added, user setup required)
 - Phase 2: Email/Password Authentication
 - Phase 3: User Profile & Firestore Foundation
 - Phase 4: Quest System
