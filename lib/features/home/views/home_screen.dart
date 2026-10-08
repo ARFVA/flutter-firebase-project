@@ -5,6 +5,7 @@ import 'package:studyquest/features/profile/controllers/profile_controller.dart'
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,10 @@ class HomeScreen extends StatelessWidget {
               if (nameController.text.trim().isNotEmpty) {
                 Get.back();
                 // Update display name in Firebase Auth
-                user.updateDisplayName(nameController.text.trim());
+                final firebaseUser = FirebaseAuth.instance.currentUser;
+                if (firebaseUser != null) {
+                  firebaseUser.updateDisplayName(nameController.text.trim());
+                }
                 // Update profile name in Firestore
                 if (profile != null) {
                   final updatedProfile = profile.copyWith(
