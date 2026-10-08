@@ -177,23 +177,25 @@ class HomeScreen extends StatelessWidget {
               
               // Stats
               if (profile != null) ...[
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 100,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.star, color: Colors.black, size: 28),
+                            const Icon(Icons.star, color: Colors.black, size: 24),
                             const SizedBox(height: 8),
                             Text(
                               '${profile.xp}',
                               style: const TextStyle(
-                                fontSize: 28,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.black,
                               ),
@@ -201,7 +203,7 @@ class HomeScreen extends StatelessWidget {
                             const Text(
                               'Total XP',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -209,31 +211,30 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 100,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.emoji_events, color: Colors.black, size: 28),
+                            const Icon(Icons.emoji_events, color: Colors.black, size: 24),
                             const SizedBox(height: 8),
                             Text(
-                              'Level ${profile.level}',
+                              'L${profile.level}',
                               style: const TextStyle(
-                                fontSize: 28,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.black,
                               ),
                             ),
                             const Text(
-                              'Current Level',
+                              'Level',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -241,31 +242,30 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(20),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 100,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           children: [
-                            const Icon(Icons.local_fire_department, color: Colors.black, size: 28),
+                            const Icon(Icons.local_fire_department, color: Colors.black, size: 24),
                             const SizedBox(height: 8),
                             Text(
                               '${profile.streak}',
                               style: const TextStyle(
-                                fontSize: 28,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.black,
                               ),
                             ),
                             const Text(
-                              'Day Streak',
+                              'Streak',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12,
                                 color: Colors.grey,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -273,8 +273,8 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 24),
                 Container(
