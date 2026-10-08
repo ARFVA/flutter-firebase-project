@@ -114,6 +114,7 @@ class QuestController extends GetxController {
           'Quest created successfully!',
           snackPosition: SnackPosition.BOTTOM,
         );
+        Get.back(); // Navigate back after successful creation
         loadQuests();
       },
     );

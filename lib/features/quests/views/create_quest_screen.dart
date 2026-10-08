@@ -32,22 +32,46 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
     final questController = Get.find<QuestController>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Create Quest'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Create Quest',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(32),
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Quest Title',
-                prefixIcon: Icon(Icons.title),
-                border: OutlineInputBorder(),
+                hintText: 'Learn Flutter basics',
+                prefixIcon: const Icon(Icons.title_outlined, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.black, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -59,10 +83,26 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Description',
-                prefixIcon: Icon(Icons.description),
-                border: OutlineInputBorder(),
+                hintText: 'What do you want to accomplish?',
+                prefixIcon: const Icon(Icons.description_outlined, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.black, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               maxLines: 3,
               validator: (value) {
@@ -75,7 +115,11 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
             const SizedBox(height: 16),
             const Text(
               'Quest Type',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(height: 8),
             SegmentedButton<String>(
@@ -84,7 +128,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   value: 'checklist',
                   label: Row(
                     children: [
-                      Icon(Icons.checklist),
+                      Icon(Icons.checklist, size: 20),
                       SizedBox(width: 8),
                       Text('Checklist'),
                     ],
@@ -94,7 +138,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   value: 'timer',
                   label: Row(
                     children: [
-                      Icon(Icons.timer),
+                      Icon(Icons.timer, size: 20),
                       SizedBox(width: 8),
                       Text('Timer'),
                     ],
@@ -111,10 +155,26 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _xpController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'XP Reward',
-                prefixIcon: Icon(Icons.star),
-                border: OutlineInputBorder(),
+                hintText: '100',
+                prefixIcon: const Icon(Icons.star_outlined, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Colors.black, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 suffixText: 'XP',
               ),
               keyboardType: TextInputType.number,
@@ -133,10 +193,26 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _durationController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Duration (minutes)',
-                  prefixIcon: Icon(Icons.access_time),
-                  border: OutlineInputBorder(),
+                  hintText: '30',
+                  prefixIcon: const Icon(Icons.access_time_outlined, size: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.grey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Colors.black, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
                   suffixText: 'min',
                 ),
                 keyboardType: TextInputType.number,
@@ -167,21 +243,32 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                               ? int.parse(_durationController.text)
                               : null,
                         );
-                        if (!questController.isLoading) {
-                          Get.back();
-                        }
                       }
                     },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 0,
               ),
               child: questController.isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : const Text(
                       'Create Quest',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
             )),
           ],
