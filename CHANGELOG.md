@@ -3,6 +3,32 @@
 All notable changes to **StudyQuest** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0-beta.1] - 2026-10-08
+
+### Added
+- Phone number authentication screens
+- OTP verification screen
+- Phone auth integration in AuthController
+- OTP sending and verification logic
+- Phone number field in login screen
+- Routing for phone auth and OTP screens
+- Phone number field in UserModel and UserProfileModel
+- Phone auth error handling
+
+### Changed
+- Updated AuthRepository to support phone auth
+- Updated AuthRemoteDataSource with phone auth methods
+- Updated UserModel to include phoneNumber
+- Updated UserProfileModel to include phoneNumber
+- Profile creation now supports phone number
+
+### Fixed
+- Async callback handling for OTP sending
+
+### Security
+- Phone auth uses Firebase's built-in security
+- OTP codes are handled securely
+
 ## [0.4.0-beta.1] - 2026-10-08
 
 ### Added

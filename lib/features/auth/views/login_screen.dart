@@ -105,6 +105,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text('Forgot Password?'),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      Get.toNamed('/phone-auth');
+                    },
+                    child: const Text('Sign in with Phone'),
+                  ),
                   const SizedBox(height: 24),
                   Obx(() => ElevatedButton(
                     onPressed: authController.isLoading

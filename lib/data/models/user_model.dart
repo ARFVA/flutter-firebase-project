@@ -3,12 +3,14 @@ class UserModel {
   final String? email;
   final String? displayName;
   final String? photoURL;
+  final String? phoneNumber;
 
   UserModel({
     required this.uid,
     this.email,
     this.displayName,
     this.photoURL,
+    this.phoneNumber,
   });
 
   factory UserModel.fromFirebaseUser(dynamic user) {
@@ -17,6 +19,7 @@ class UserModel {
       email: user.email,
       displayName: user.displayName,
       photoURL: user.photoURL,
+      phoneNumber: user.phoneNumber,
     );
   }
 
@@ -26,6 +29,7 @@ class UserModel {
       'email': email,
       'displayName': displayName,
       'photoURL': photoURL,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -35,6 +39,7 @@ class UserModel {
       email: map['email'],
       displayName: map['displayName'],
       photoURL: map['photoURL'],
+      phoneNumber: map['phoneNumber'],
     );
   }
 }

@@ -3,6 +3,7 @@ class UserProfileModel {
   final String displayName;
   final String email;
   final String? photoURL;
+  final String? phoneNumber;
   final int level;
   final int xp;
   final int dailyTargetXp;
@@ -15,6 +16,7 @@ class UserProfileModel {
     required this.displayName,
     required this.email,
     this.photoURL,
+    this.phoneNumber,
     this.level = 1,
     this.xp = 0,
     this.dailyTargetXp = 500,
@@ -28,6 +30,7 @@ class UserProfileModel {
     required String displayName,
     required String email,
     String? photoURL,
+    String? phoneNumber,
   }) {
     final now = DateTime.now();
     return UserProfileModel(
@@ -35,6 +38,7 @@ class UserProfileModel {
       displayName: displayName,
       email: email,
       photoURL: photoURL,
+      phoneNumber: phoneNumber,
       level: 1,
       xp: 0,
       dailyTargetXp: 500,
@@ -50,6 +54,7 @@ class UserProfileModel {
       'displayName': displayName,
       'email': email,
       'photoURL': photoURL,
+      'phoneNumber': phoneNumber,
       'level': level,
       'xp': xp,
       'dailyTargetXp': dailyTargetXp,
@@ -65,6 +70,7 @@ class UserProfileModel {
       displayName: map['displayName'] ?? '',
       email: map['email'] ?? '',
       photoURL: map['photoURL'],
+      phoneNumber: map['phoneNumber'],
       level: map['level'] ?? 1,
       xp: map['xp'] ?? 0,
       dailyTargetXp: map['dailyTargetXp'] ?? 500,
@@ -79,6 +85,7 @@ class UserProfileModel {
     String? displayName,
     String? email,
     String? photoURL,
+    String? phoneNumber,
     int? level,
     int? xp,
     int? dailyTargetXp,
@@ -91,6 +98,7 @@ class UserProfileModel {
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       photoURL: photoURL ?? this.photoURL,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       level: level ?? this.level,
       xp: xp ?? this.xp,
       dailyTargetXp: dailyTargetXp ?? this.dailyTargetXp,

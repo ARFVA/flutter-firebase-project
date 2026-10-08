@@ -20,6 +20,10 @@ class AuthController extends GetxController {
   final RxString _errorMessage = ''.obs;
   String get errorMessage => _errorMessage.value;
 
+  // Phone auth state
+  final RxString _verificationId = ''.obs;
+  String get verificationId => _verificationId.value;
+
   @override
   void onInit() {
     super.onInit();
@@ -61,6 +65,7 @@ class AuthController extends GetxController {
           displayName: email.split('@')[0],
           email: user.email ?? email,
           photoURL: user.photoURL,
+          phoneNumber: user.phoneNumber,
         );
 
         final profileResult = await userProfileRepository.createUserProfile(profile);
@@ -175,5 +180,80 @@ class AuthController extends GetxController {
 
   void clearError() {
     _errorMessage.value = '';
+  }
+
+  Future<void> sendOtp(String phoneNumber) async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    final result = await repository.sendOtp(phoneNumber);
+
+    result.fold(
+      (failure) {
+        _errorMessage.value = failure.message;
+        _isLoading.value = false;
+        Get.snackbar(
+          'Error',
+          failure.message,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+      (verificationId) {
+        _verificationId.value = verificationId;
+        _isLoading.value = false;
+        Get.toNamed('/otp', arguments: {
+          'phoneNumber': phoneNumber,
+          'verificationId': verificationId,
+        });
+      },
+    );
+  }
+
+  Future<void> verifyOtp(String verificationId, String otp) async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    final result = await repository.verifyOtp(verificationId, otp);
+
+    result.fold(
+      (failure) {
+        _errorMessage.value = failure.message;
+        _isLoading.value = false;
+        Get.snackbar(
+          'Verification Failed',
+          failure.message,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+      (user) async {
+        // Check if user profile exists, create if not
+        final profileResult = await userProfileRepository.getUserProfile(user.uid);
+        
+        profileResult.fold(
+          (failure) async {
+            // Profile doesn't exist, create it
+            final displayName = user.phoneNumber ?? user.email?.split('@')[0] ?? 'User';
+            final profile = UserProfileModel.create(
+              uid: user.uid,
+              displayName: displayName,
+              email: user.email ?? '',
+              photoURL: user.photoURL,
+              phoneNumber: user.phoneNumber,
+            );
+            await userProfileRepository.createUserProfile(profile);
+          },
+          (profile) {
+            // Profile exists, do nothing
+          },
+        );
+
+        _isLoading.value = false;
+        Get.snackbar(
+          'Success',
+          'Phone verification successful!',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      },
+    );
   }
 }
