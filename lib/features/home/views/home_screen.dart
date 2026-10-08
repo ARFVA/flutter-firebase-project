@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
+import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -194,14 +195,32 @@ class HomeScreen extends StatelessWidget {
                         style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () => Get.to(() => const QuestListScreen()),
-                        icon: const Icon(Icons.assignment),
-                        label: const Text('View Quests'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          foregroundColor: Colors.white,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => Get.to(() => const QuestListScreen()),
+                              icon: const Icon(Icons.assignment),
+                              label: const Text('Quests'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.deepPurple,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () => Get.to(() => const StudyRoomScreen()),
+                              icon: const Icon(Icons.meeting_room),
+                              label: const Text('Study Room'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -8,4 +8,5 @@ abstract class Routes {
   static const CREATE_QUEST = '/create-quest';
   static const PHONE_AUTH = '/phone-auth';
   static const OTP = '/otp';
+  static const STUDY_ROOM = '/study-room';
 }

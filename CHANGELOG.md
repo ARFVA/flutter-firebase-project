@@ -3,6 +3,32 @@
 All notable changes to **StudyQuest** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.0-beta.1] - 2026-10-08
+
+### Added
+- Firebase Realtime Database dependency
+- RoomModel for study rooms
+- ParticipantModel for room participants
+- RealtimeDBRemoteDataSource for Realtime DB operations
+- RoomRepository with clean architecture
+- RoomController with GetX state management
+- StudyRoomScreen with real-time participant updates
+- Room creation and joining functionality
+- Participant status tracking (studying/break/offline)
+- Real-time presence updates
+- Routing for study room screen
+- Realtime DB security rules
+- Study room integration in home screen
+
+### Changed
+- Updated main.dart to initialize Realtime DB dependencies
+- Updated home screen to include study room button
+
+### Security
+- Realtime DB security rules for rooms and participants
+- Room ownership enforcement
+- Participant read/write restrictions
+
 ## [0.5.0-beta.1] - 2026-10-08
 
 ### Added

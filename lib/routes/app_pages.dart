@@ -8,6 +8,7 @@ import 'package:studyquest/features/auth/views/otp_screen.dart';
 import 'package:studyquest/features/home/views/home_screen.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/quests/views/create_quest_screen.dart';
+import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 
 part 'app_routes.dart';
 
@@ -44,6 +45,11 @@ class AppPages {
     GetPage(
       name: Routes.CREATE_QUEST,
       page: () => const CreateQuestScreen(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: Routes.STUDY_ROOM,
+      page: () => const StudyRoomScreen(),
       middlewares: [AuthMiddleware()],
     ),
   ];

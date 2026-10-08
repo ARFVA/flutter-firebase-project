@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'core/constants/app_constants.dart';
 import 'routes/app_pages.dart';
 import 'data/datasources/auth_datasource.dart';
 import 'data/datasources/firestore_datasource.dart';
 import 'data/datasources/quest_datasource.dart';
 import 'data/datasources/activity_datasource.dart';
+import 'data/datasources/realtime_db_datasource.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/user_profile_repository_impl.dart';
 import 'data/repositories/quest_repository_impl.dart';
 import 'data/repositories/activity_repository_impl.dart';
+import 'data/repositories/room_repository_impl.dart';
 import 'features/auth/controllers/auth_controller.dart';
 import 'features/quests/controllers/quest_controller.dart';
 import 'features/profile/controllers/profile_controller.dart';
+import 'features/study_room/controllers/room_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
@@ -43,6 +47,9 @@ void main() async {
   final activityRemoteDataSource = ActivityRemoteDataSourceImpl(FirebaseFirestore.instance);
   final activityRepository = ActivityRepositoryImpl(activityRemoteDataSource);
 
+  final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(FirebaseDatabase.instance);
+  final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
+
   final authController = AuthController(authRepository, userProfileRepository);
   final questController = QuestController(
     questRepository,
@@ -51,11 +58,13 @@ void main() async {
     activityRepository,
   );
   final profileController = ProfileController(userProfileRepository, authController);
+  final roomController = RoomController(roomRepository, authController);
 
   runApp(StudyQuestApp(
     authController: authController,
     questController: questController,
     profileController: profileController,
+    roomController: roomController,
   ));
 }
 
@@ -63,12 +72,14 @@ class StudyQuestApp extends StatelessWidget {
   final AuthController authController;
   final QuestController questController;
   final ProfileController profileController;
+  final RoomController roomController;
 
   const StudyQuestApp({
     super.key,
     required this.authController,
     required this.questController,
     required this.profileController,
+    required this.roomController,
   });
 
   @override
@@ -85,6 +96,7 @@ class StudyQuestApp extends StatelessWidget {
         Get.put(authController);
         Get.put(questController);
         Get.put(profileController);
+        Get.put(roomController);
       }),
     );
   }
