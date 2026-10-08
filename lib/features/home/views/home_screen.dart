@@ -210,7 +210,7 @@ class HomeScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                      Container(
+                        Container(
                         width: 100,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
