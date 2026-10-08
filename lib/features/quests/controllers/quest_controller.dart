@@ -5,6 +5,7 @@ import 'package:studyquest/data/repositories/quest_repository_impl.dart';
 import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
 import 'package:studyquest/data/repositories/activity_repository_impl.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/core/utils/gamification_utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -79,7 +80,14 @@ class QuestController extends GetxController {
     int? durationMinutes,
   }) async {
     final user = authController.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      Get.snackbar(
+        'Error',
+        'User not logged in',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     _isLoading.value = true;
     _errorMessage.value = '';
@@ -114,7 +122,7 @@ class QuestController extends GetxController {
           'Quest created successfully!',
           snackPosition: SnackPosition.BOTTOM,
         );
-        Get.back(); // Navigate back after successful creation
+        Get.off(() => const QuestListScreen()); // Navigate to quest list
         loadQuests();
       },
     );
