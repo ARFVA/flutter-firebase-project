@@ -191,6 +191,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+                          ),
                           Text(
                             user.email ?? '',
                             style: TextStyle(
