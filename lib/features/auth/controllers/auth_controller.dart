@@ -33,6 +33,11 @@ class AuthController extends GetxController {
   void _initAuthListener() {
     repository.authStateChanges().listen((user) {
       _currentUser.value = user;
+      if (user != null && Get.currentRoute != '/home') {
+        Get.offAllNamed('/home');
+      } else if (user == null && Get.currentRoute != '/login') {
+        Get.offAllNamed('/login');
+      }
     });
   }
 
@@ -87,6 +92,7 @@ class AuthController extends GetxController {
               'Registration successful!',
               snackPosition: SnackPosition.BOTTOM,
             );
+            Get.offAllNamed('/home');
           },
         );
       },
@@ -122,6 +128,7 @@ class AuthController extends GetxController {
           'Login successful!',
           snackPosition: SnackPosition.BOTTOM,
         );
+        Get.offAllNamed('/home');
       },
     );
   }
@@ -253,6 +260,7 @@ class AuthController extends GetxController {
           'Phone verification successful!',
           snackPosition: SnackPosition.BOTTOM,
         );
+        Get.offAllNamed('/home');
       },
     );
   }

@@ -1,0 +1,19 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": false,
+    "rooms": {
+      ".read": "auth != null",
+      "$roomId": {
+        ".read": "auth != null",
+        ".write": "auth != null && newData.child('createdBy').val() == auth.uid",
+        "participants": {
+          "$userId": {
+            ".read": "auth != null && auth.uid == $userId",
+            ".write": "auth != null && auth.uid == $userId"
+          }
+        }
+      }
+    }
+  }
+}

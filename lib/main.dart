@@ -33,14 +33,15 @@ void main() async {
     );
     
     // Initialize Firebase App Check (debug provider for development)
-    try {
-      await FirebaseAppCheck.instance.activate(
-        androidProvider: AndroidProvider.debug,
-        appleProvider: AppleProvider.debug,
-      );
-    } catch (e) {
-      debugPrint('App Check not initialized: $e');
-    }
+    // Commented out for development to prevent API errors
+    // try {
+    //   await FirebaseAppCheck.instance.activate(
+    //     androidProvider: AndroidProvider.debug,
+    //     appleProvider: AppleProvider.debug,
+    //   );
+    // } catch (e) {
+    //   debugPrint('App Check not initialized: $e');
+    // }
   } catch (e) {
     debugPrint('Firebase initialization error: $e');
   }
@@ -58,7 +59,9 @@ void main() async {
   final activityRemoteDataSource = ActivityRemoteDataSourceImpl(FirebaseFirestore.instance);
   final activityRepository = ActivityRepositoryImpl(activityRemoteDataSource);
 
-  final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(FirebaseDatabase.instance);
+  final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(
+    FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: 'https://studyquest-firebase-default-rtdb.asia-southeast1.firebasedatabase.app')
+  );
   final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
 
   final authController = AuthController(authRepository, userProfileRepository);
