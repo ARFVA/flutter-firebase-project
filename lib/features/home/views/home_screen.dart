@@ -32,6 +32,9 @@ class HomeScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () async {
               if (nameController.text.trim().isNotEmpty) {
+                // Close dialog first
+                Get.back();
+
                 // Update display name in Firebase Auth
                 final firebaseUser = FirebaseAuth.instance.currentUser;
                 if (firebaseUser != null) {
@@ -54,9 +57,6 @@ class HomeScreen extends StatelessWidget {
 
                 // Reload profile data
                 await profileController.loadProfile();
-
-                // Close dialog
-                Get.back();
 
                 // Show success message
                 Get.snackbar(

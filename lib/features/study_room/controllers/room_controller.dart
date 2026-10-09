@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/room_model.dart';
 import 'package:studyquest/data/repositories/room_repository_impl.dart';
@@ -42,7 +43,13 @@ class RoomController extends GetxController {
       result.fold(
         (failure) {
           _isLoading.value = false;
-          Get.snackbar('Error', failure.message);
+          Get.snackbar(
+            'Error',
+            failure.message,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade700,
+            colorText: Colors.white,
+          );
         },
         (createdRoomId) {
           _currentRoomId.value = createdRoomId;
@@ -69,12 +76,24 @@ class RoomController extends GetxController {
       result.fold(
         (failure) {
           _isLoading.value = false;
-          Get.snackbar('Error', failure.message);
+          Get.snackbar(
+            'Error',
+            failure.message,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade700,
+            colorText: Colors.white,
+          );
         },
         (_) {
           _isLoading.value = false;
           _listenToParticipants(roomId);
-          Get.snackbar('Success', 'Joined room successfully');
+          Get.snackbar(
+            'Success',
+            'Joined room successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green.shade700,
+            colorText: Colors.white,
+          );
         },
       );
     });
@@ -105,13 +124,25 @@ class RoomController extends GetxController {
     repository.leaveRoom(_currentRoomId.value, user.uid).then((result) {
       result.fold(
         (failure) {
-          Get.snackbar('Error', failure.message);
+          Get.snackbar(
+            'Error',
+            failure.message,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade700,
+            colorText: Colors.white,
+          );
         },
         (_) {
           _participantsSubscription?.cancel();
           _participants.value = {};
           _currentRoomId.value = '';
-          Get.snackbar('Success', 'Left room');
+          Get.snackbar(
+            'Success',
+            'Left room',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green.shade700,
+            colorText: Colors.white,
+          );
         },
       );
     });

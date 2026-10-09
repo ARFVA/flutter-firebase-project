@@ -62,6 +62,8 @@ class QuestController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (quests) {
@@ -318,6 +320,8 @@ class QuestController extends GetxController {
                   'Success',
                   message,
                   snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green.shade700,
+                  colorText: Colors.white,
                   duration: const Duration(seconds: 3),
                 );
                 loadQuests();
