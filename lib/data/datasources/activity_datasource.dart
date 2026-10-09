@@ -64,6 +64,7 @@ class ActivityRemoteDataSourceImpl implements ActivityRemoteDataSource {
           .where('createdAt', isGreaterThanOrEqualTo: startOfDay.toIso8601String())
           .where('createdAt', isLessThan: endOfDay.toIso8601String())
           .orderBy('createdAt', descending: true)
+          .orderBy('__name__', descending: true)
           .get();
 
       return snapshot.docs
