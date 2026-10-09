@@ -3,6 +3,34 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/quests/controllers/quest_controller.dart';
 
+// Input formatter for thousands separator
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    
+    if (digits.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+    
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 == 0) {
+        buffer.write('.');
+      }
+      buffer.write(digits[i]);
+    }
+    
+    return TextEditingValue(
+      text: buffer.toString(),
+      selection: TextSelection.collapsed(offset: buffer.length),
+    );
+  }
+}
+
 class CreateQuestScreen extends StatefulWidget {
   const CreateQuestScreen({super.key});
 
@@ -57,16 +85,18 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 labelText: 'Quest Title',
                 hintText: 'Learn Flutter basics',
                 prefixIcon: const Icon(Icons.title_outlined, size: 20),
+                filled: true,
+                fillColor: Colors.grey.shade100,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -88,16 +118,18 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 labelText: 'Description',
                 hintText: 'What do you want to accomplish?',
                 prefixIcon: const Icon(Icons.description_outlined, size: 20),
+                filled: true,
+                fillColor: Colors.grey.shade100,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -160,16 +192,18 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 labelText: 'XP Reward',
                 hintText: '100',
                 prefixIcon: const Icon(Icons.star_outlined, size: 20),
+                filled: true,
+                fillColor: Colors.grey.shade100,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: Colors.black, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
@@ -181,18 +215,19 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(5), // Max 5 digits (max 99,999)
+                ThousandsSeparatorInputFormatter(),
+                LengthLimitingTextInputFormatter(8), // Max 8 digits with separator
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter XP amount';
                 }
-                final xp = int.tryParse(value);
+                final xp = int.tryParse(value.replaceAll('.', ''));
                 if (xp == null || xp <= 0) {
                   return 'Please enter a valid XP amount';
                 }
                 if (xp > 10000) {
-                  return 'Maximum XP is 10,000';
+                  return 'Maximum XP is 10.000';
                 }
                 return null;
               },
@@ -205,16 +240,18 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   labelText: 'Duration (minutes)',
                   hintText: '30',
                   prefixIcon: const Icon(Icons.access_time_outlined, size: 20),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.black, width: 2),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
@@ -224,11 +261,15 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   suffixText: 'min',
                 ),
                 keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  ThousandsSeparatorInputFormatter(),
+                ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter duration';
                   }
-                  final duration = int.tryParse(value);
+                  final duration = int.tryParse(value.replaceAll('.', ''));
                   if (duration == null || duration <= 0) {
                     return 'Please enter a valid duration';
                   }
@@ -242,14 +283,18 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                   ? null
                   : () {
                       if (_formKey.currentState!.validate()) {
+                        // Remove dots from XP input before parsing
+                        final xpValue = int.parse(_xpController.text.replaceAll('.', ''));
+                        final durationValue = _selectedType == 'timer'
+                            ? int.parse(_durationController.text.replaceAll('.', ''))
+                            : null;
+                        
                         questController.createQuest(
                           title: _titleController.text.trim(),
                           description: _descriptionController.text.trim(),
                           type: _selectedType,
-                          xp: int.parse(_xpController.text),
-                          durationMinutes: _selectedType == 'timer'
-                              ? int.parse(_durationController.text)
-                              : null,
+                          xp: xpValue,
+                          durationMinutes: durationValue,
                         );
                       }
                     },

@@ -190,6 +190,8 @@ class QuestListScreen extends StatelessWidget {
             decoration: quest.isCompleted ? TextDecoration.lineThrough : null,
             color: Colors.black,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,6 +202,8 @@ class QuestListScreen extends StatelessWidget {
                 color: Colors.grey,
                 fontSize: 14,
               ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
             const SizedBox(height: 8),
             Row(
@@ -237,9 +241,23 @@ class QuestListScreen extends StatelessWidget {
                 onPressed: () async {
                   Get.defaultDialog(
                     title: 'Complete Quest',
+                    titleStyle: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
                     middleText: 'Mark this quest as completed?',
+                    middleTextStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
                     textConfirm: 'Complete',
                     textCancel: 'Cancel',
+                    confirmTextColor: Colors.white,
+                    cancelTextColor: Colors.grey.shade700,
+                    buttonColor: Colors.green.shade700,
+                    cancelColor: Colors.transparent,
+                    radius: 16,
                     onConfirm: () async {
                       Get.back();
                       await controller.completeQuest(quest.id);

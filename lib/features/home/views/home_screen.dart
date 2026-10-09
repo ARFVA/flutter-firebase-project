@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/profile/controllers/profile_controller.dart';
@@ -36,6 +37,36 @@ String formatNumberWithSeparator(int number) {
   return buffer.toString();
 }
 
+// Input formatter for thousands separator
+class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Remove all non-digit characters
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    
+    if (digits.isEmpty) {
+      return newValue.copyWith(text: '');
+    }
+    
+    // Format with thousands separator
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i > 0 && (digits.length - i) % 3 == 0) {
+        buffer.write('.');
+      }
+      buffer.write(digits[i]);
+    }
+    
+    return TextEditingValue(
+      text: buffer.toString(),
+      selection: TextSelection.collapsed(offset: buffer.length),
+    );
+  }
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -44,19 +75,40 @@ class HomeScreen extends StatelessWidget {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Edit Display Name'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Edit Display Name',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+        ),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Display Name',
             hintText: 'Enter your name',
-            border: OutlineInputBorder(),
+            filled: true,
+            fillColor: Colors.grey.shade100,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Colors.blue, width: 2),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel'),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey.shade700,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -86,14 +138,20 @@ class HomeScreen extends StatelessWidget {
                   snackPosition: SnackPosition.BOTTOM,
                   backgroundColor: Colors.green.shade700,
                   colorText: Colors.white,
+                  borderRadius: 12,
+                  margin: const EdgeInsets.all(16),
                 );
               }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue.shade700,
               foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Save'),
+            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -482,11 +540,23 @@ class HomeScreen extends StatelessWidget {
                             onPressed: () {
                               Get.defaultDialog(
                                 title: 'Reset XP',
+                                titleStyle: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.black,
+                                ),
                                 middleText: 'Reset XP to 0? This cannot be undone.',
+                                middleTextStyle: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
                                 textConfirm: 'Reset',
                                 textCancel: 'Cancel',
                                 confirmTextColor: Colors.white,
-                                buttonColor: Colors.red,
+                                cancelTextColor: Colors.grey.shade700,
+                                buttonColor: Colors.red.shade700,
+                                cancelColor: Colors.transparent,
+                                radius: 16,
                                 onConfirm: () {
                                   Get.back();
                                   profileController.resetXP();
