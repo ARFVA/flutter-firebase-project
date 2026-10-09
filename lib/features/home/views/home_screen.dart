@@ -9,7 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 // Utility function to format numbers with K suffix
 String formatNumber(int number) {
-  if (number >= 1000000) {
+  if (number >= 1000000000) {
+    return '${(number / 1000000000).toStringAsFixed(1)}B';
+  } else if (number >= 1000000) {
     return '${(number / 1000000).toStringAsFixed(1)}M';
   } else if (number >= 1000) {
     return '${(number / 1000).toStringAsFixed(1)}K';
@@ -407,7 +409,7 @@ class HomeScreen extends StatelessWidget {
               ],
               
               const SizedBox(height: 32),
-              
+
               // Quick actions
               const Text(
                 'Quick Actions',
@@ -450,6 +452,55 @@ class HomeScreen extends StatelessWidget {
                               ),
                             ),
                             child: const Text('View'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.refresh, size: 32, color: Colors.black),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Reset XP',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          OutlinedButton(
+                            onPressed: () {
+                              Get.defaultDialog(
+                                title: 'Reset XP',
+                                middleText: 'Reset XP to 0? This cannot be undone.',
+                                textConfirm: 'Reset',
+                                textCancel: 'Cancel',
+                                confirmTextColor: Colors.white,
+                                buttonColor: Colors.red,
+                                onConfirm: () {
+                                  Get.back();
+                                  profileController.resetXP();
+                                },
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.red,
+                              side: const BorderSide(color: Colors.red),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text('Reset'),
                           ),
                         ],
                       ),

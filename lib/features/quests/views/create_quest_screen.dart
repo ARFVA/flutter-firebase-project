@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/quests/controllers/quest_controller.dart';
 
@@ -178,6 +179,10 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 suffixText: 'XP',
               ),
               keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(5), // Max 5 digits (max 99,999)
+              ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter XP amount';
@@ -185,6 +190,9 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 final xp = int.tryParse(value);
                 if (xp == null || xp <= 0) {
                   return 'Please enter a valid XP amount';
+                }
+                if (xp > 10000) {
+                  return 'Maximum XP is 10,000';
                 }
                 return null;
               },

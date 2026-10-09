@@ -120,4 +120,45 @@ class ProfileController extends GetxController {
   Future<void> forceRefresh() async {
     await loadProfile();
   }
+
+  // Reset XP to reasonable value (for debugging/testing)
+  Future<void> resetXP() async {
+    final user = authController.currentUser;
+    if (user == null || _profile.value == null) return;
+
+    _isLoading.value = true;
+
+    final resetProfile = _profile.value!.copyWith(
+      xp: 0,
+      level: 1,
+      streak: 0,
+      updatedAt: DateTime.now(),
+    );
+
+    final result = await repository.updateUserProfile(resetProfile);
+
+    result.fold(
+      (failure) {
+        _isLoading.value = false;
+        Get.snackbar(
+          'Error',
+          failure.message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
+        );
+      },
+      (_) {
+        _profile.value = resetProfile;
+        _isLoading.value = false;
+        Get.snackbar(
+          'Success',
+          'XP reset to 0',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
+        );
+      },
+    );
+  }
 }
