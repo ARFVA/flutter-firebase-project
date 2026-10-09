@@ -128,7 +128,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Obx(() {
         final user = authController.currentUser;
-        final profile = profileController.profile;
+        final profile = profileController.profileObservable.value;
 
         if (user == null) {
           return const Center(child: CircularProgressIndicator());

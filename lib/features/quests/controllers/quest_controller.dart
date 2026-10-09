@@ -284,6 +284,9 @@ class QuestController extends GetxController {
 
                 await userProfileRepository.updateUserProfile(updatedProfile);
 
+                // Update local profile state directly to trigger UI refresh immediately
+                profileController.updateProfileState(updatedProfile);
+
                 // Create activity record
                 final activityId = const Uuid().v4();
                 final activity = ActivityModel.create(

@@ -16,6 +16,9 @@ class ProfileController extends GetxController {
   final RxBool _isLoading = false.obs;
   bool get isLoading => _isLoading.value;
 
+  // Allow direct access to the observable for reactive updates
+  Rx<UserProfileModel?> get profileObservable => _profile;
+
   @override
   void onInit() {
     super.onInit();
@@ -107,5 +110,9 @@ class ProfileController extends GetxController {
         );
       },
     );
+  }
+
+  void updateProfileState(UserProfileModel profile) {
+    _profile.value = profile;
   }
 }
