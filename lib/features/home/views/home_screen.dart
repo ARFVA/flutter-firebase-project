@@ -35,15 +35,7 @@ class HomeScreen extends StatelessWidget {
                 // Close dialog first
                 Get.back();
 
-                // Update display name in Firebase Auth
-                final firebaseUser = FirebaseAuth.instance.currentUser;
-                if (firebaseUser != null) {
-                  await firebaseUser.updateDisplayName(nameController.text.trim());
-                  // Reload user to get updated display name
-                  await firebaseUser.reload();
-                }
-
-                // Update profile name in Firestore
+                // Update profile name in Firestore only (skip Firebase Auth to avoid certificate error)
                 if (profile != null) {
                   final updatedProfile = profile.copyWith(
                     displayName: nameController.text.trim(),
