@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:studyquest/features/auth/views/login_screen.dart';
 import 'package:studyquest/features/auth/views/register_screen.dart';
 import 'package:studyquest/features/auth/views/phone_auth_screen.dart';

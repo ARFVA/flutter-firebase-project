@@ -65,34 +65,35 @@ void main() async {
   final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
 
   final authController = AuthController(authRepository, userProfileRepository);
+  final profileController = ProfileController(userProfileRepository, authController);
   final questController = QuestController(
     questRepository,
     authController,
     userProfileRepository,
     activityRepository,
+    profileController,
   );
-  final profileController = ProfileController(userProfileRepository, authController);
   final roomController = RoomController(roomRepository, authController);
 
   runApp(StudyQuestApp(
     authController: authController,
-    questController: questController,
     profileController: profileController,
+    questController: questController,
     roomController: roomController,
   ));
 }
 
 class StudyQuestApp extends StatelessWidget {
   final AuthController authController;
-  final QuestController questController;
   final ProfileController profileController;
+  final QuestController questController;
   final RoomController roomController;
 
   const StudyQuestApp({
     super.key,
     required this.authController,
-    required this.questController,
     required this.profileController,
+    required this.questController,
     required this.roomController,
   });
 
@@ -108,8 +109,8 @@ class StudyQuestApp extends StatelessWidget {
       getPages: AppPages.routes,
       initialBinding: BindingsBuilder(() {
         Get.put(authController);
-        Get.put(questController);
         Get.put(profileController);
+        Get.put(questController);
         Get.put(roomController);
       }),
     );

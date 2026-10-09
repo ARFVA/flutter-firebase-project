@@ -7,6 +7,7 @@ import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
 import 'package:studyquest/data/repositories/activity_repository_impl.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
+import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:studyquest/core/utils/gamification_utils.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,12 +16,14 @@ class QuestController extends GetxController {
   final AuthController authController;
   final UserProfileRepository userProfileRepository;
   final ActivityRepository activityRepository;
+  final ProfileController profileController;
 
   QuestController(
     this.repository,
     this.authController,
     this.userProfileRepository,
     this.activityRepository,
+    this.profileController,
   );
 
   // Quest state
@@ -310,6 +313,9 @@ class QuestController extends GetxController {
                 );
 
                 _isLoading.value = false;
+                
+                // Refresh profile to update XP on home screen
+                profileController.loadProfile();
                 
                 String message = 'Quest completed! +${quest.xp} XP';
                 if (leveledUp) {

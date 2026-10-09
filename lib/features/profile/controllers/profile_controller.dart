@@ -61,6 +61,8 @@ class ProfileController extends GetxController {
           'Error',
           failure.message,
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade700,
+          colorText: Colors.white,
         );
       },
       (_) {
@@ -70,6 +72,8 @@ class ProfileController extends GetxController {
           'Success',
           'Daily target updated!',
           snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade700,
+          colorText: Colors.white,
         );
       },
     );
