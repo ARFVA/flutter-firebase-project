@@ -217,6 +217,19 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> refreshCurrentUserWithProfile(UserProfileModel? profile) async {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null) {
+      await firebaseUser.reload();
+      var userModel = UserModel.fromFirebaseUser(firebaseUser);
+      // Update display name from profile if available
+      if (profile != null && profile.displayName != null) {
+        userModel = userModel.copyWith(displayName: profile.displayName);
+      }
+      _currentUser.value = userModel;
+    }
+  }
+
   Future<void> sendOtp(String phoneNumber) async {
     _isLoading.value = true;
     _errorMessage.value = '';

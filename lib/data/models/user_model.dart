@@ -42,4 +42,20 @@ class UserModel {
       phoneNumber: map['phoneNumber'],
     );
   }
+
+  UserModel copyWith({
+    String? uid,
+    String? email,
+    String? displayName,
+    String? photoURL,
+    String? phoneNumber,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      photoURL: photoURL ?? this.photoURL,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+    );
+  }
 }

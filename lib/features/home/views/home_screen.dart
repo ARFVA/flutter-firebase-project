@@ -7,11 +7,38 @@ import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Utility function to format numbers with K suffix
+String formatNumber(int number) {
+  if (number >= 1000000) {
+    return '${(number / 1000000).toStringAsFixed(1)}M';
+  } else if (number >= 1000) {
+    return '${(number / 1000).toStringAsFixed(1)}K';
+  } else {
+    return number.toString();
+  }
+}
+
+// Utility function to format numbers with thousands separator
+String formatNumberWithSeparator(int number) {
+  final buffer = StringBuffer();
+  final numberStr = number.toString();
+  int length = numberStr.length;
+
+  for (int i = 0; i < length; i++) {
+    if (i > 0 && (length - i) % 3 == 0) {
+      buffer.write('.');
+    }
+    buffer.write(numberStr[i]);
+  }
+
+  return buffer.toString();
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   void _showEditNameDialog(UserProfileModel? profile, dynamic user, ProfileController profileController, AuthController authController) {
-    final nameController = TextEditingController(text: user.displayName ?? '');
+    final nameController = TextEditingController(text: profile?.displayName ?? user.displayName ?? '');
 
     Get.dialog(
       AlertDialog(
@@ -42,10 +69,10 @@ class HomeScreen extends StatelessWidget {
                     updatedAt: DateTime.now(),
                   );
                   await profileController.updateUserProfile(updatedProfile);
-                }
 
-                // Refresh auth controller to update user data
-                await authController.refreshCurrentUser();
+                  // Refresh auth controller with updated profile display name
+                  await authController.refreshCurrentUserWithProfile(updatedProfile);
+                }
 
                 // Reload profile data
                 await profileController.loadProfile();
@@ -167,7 +194,7 @@ class HomeScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      user.displayName ?? user.email ?? 'User',
+                                      profile?.displayName ?? user.displayName ?? user.email ?? 'User',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -215,7 +242,7 @@ class HomeScreen extends StatelessWidget {
                               const Icon(Icons.star, color: Colors.black, size: 24),
                               const SizedBox(height: 8),
                               Text(
-                                '${profile.xp}',
+                                formatNumber(profile.xp),
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w800,
@@ -320,7 +347,7 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${profile.dailyTargetXp} XP',
+                            '${formatNumberWithSeparator(profile.dailyTargetXp)} XP',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -367,7 +394,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${profile.xp % 100}/100 XP to next level',
+                        '${formatNumberWithSeparator(profile.xp % 100)}/100 XP to next level',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
