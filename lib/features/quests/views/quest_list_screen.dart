@@ -256,7 +256,6 @@ class QuestListScreen extends StatelessWidget {
                     confirmTextColor: Colors.white,
                     cancelTextColor: Colors.grey.shade700,
                     buttonColor: Colors.green.shade700,
-                    cancelColor: Colors.transparent,
                     radius: 16,
                     onConfirm: () async {
                       Get.back();

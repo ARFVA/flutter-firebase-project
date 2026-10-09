@@ -555,7 +555,6 @@ class HomeScreen extends StatelessWidget {
                                 confirmTextColor: Colors.white,
                                 cancelTextColor: Colors.grey.shade700,
                                 buttonColor: Colors.red.shade700,
-                                cancelColor: Colors.transparent,
                                 radius: 16,
                                 onConfirm: () {
                                   Get.back();
