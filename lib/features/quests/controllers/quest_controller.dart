@@ -284,8 +284,12 @@ class QuestController extends GetxController {
 
                 await userProfileRepository.updateUserProfile(updatedProfile);
 
-                // Update local profile state directly to trigger UI refresh immediately
+                // Update local profile state immediately
                 profileController.updateProfileState(updatedProfile);
+
+                // Wait a bit for Firestore to propagate, then reload to be safe
+                await Future.delayed(const Duration(milliseconds: 500));
+                await profileController.forceRefresh();
 
                 // Create activity record
                 final activityId = const Uuid().v4();

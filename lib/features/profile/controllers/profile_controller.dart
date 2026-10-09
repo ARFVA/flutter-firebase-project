@@ -115,4 +115,9 @@ class ProfileController extends GetxController {
   void updateProfileState(UserProfileModel profile) {
     _profile.value = profile;
   }
+
+  // Force refresh profile from Firestore
+  Future<void> forceRefresh() async {
+    await loadProfile();
+  }
 }

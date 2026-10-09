@@ -234,15 +234,15 @@ class QuestListScreen extends StatelessWidget {
             ? const Icon(Icons.check_circle, color: Colors.grey)
             : IconButton(
                 icon: const Icon(Icons.check_circle_outline),
-                onPressed: () {
+                onPressed: () async {
                   Get.defaultDialog(
                     title: 'Complete Quest',
                     middleText: 'Mark this quest as completed?',
                     textConfirm: 'Complete',
                     textCancel: 'Cancel',
-                    onConfirm: () {
+                    onConfirm: () async {
                       Get.back();
-                      controller.completeQuest(quest.id);
+                      await controller.completeQuest(quest.id);
                     },
                   );
                 },
