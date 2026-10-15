@@ -34,7 +34,19 @@ class RealtimeDBRemoteDataSourceImpl implements RealtimeDBRemoteDataSource {
   Future<void> joinRoom(String roomId, String userId, ParticipantModel participant) async {
     try {
       final participantRef = database.ref('rooms/$roomId/participants/$userId');
-      await participantRef.set(participant.toMap());
+      await participantRef.set({
+        ...participant.toMap(),
+        'online': true,
+      });
+
+      // Presence: when this client disconnects (crash, network loss, kill),
+      // the server marks the participant offline instead of leaving them
+      // appearing active forever.
+      await participantRef.onDisconnect().update({
+        'online': false,
+        'status': 'offline',
+        'lastSeen': ServerValue.timestamp,
+      });
     } on FirebaseException catch (e) {
       throw ServerException('Realtime DB error: ${e.message}');
     } catch (e) {
@@ -46,6 +58,8 @@ class RealtimeDBRemoteDataSourceImpl implements RealtimeDBRemoteDataSource {
   Future<void> leaveRoom(String roomId, String userId) async {
     try {
       final participantRef = database.ref('rooms/$roomId/participants/$userId');
+      // Cancel the pending onDisconnect handler before explicit removal.
+      await participantRef.onDisconnect().cancel();
       await participantRef.remove();
     } on FirebaseException catch (e) {
       throw ServerException('Realtime DB error: ${e.message}');
@@ -60,7 +74,7 @@ class RealtimeDBRemoteDataSourceImpl implements RealtimeDBRemoteDataSource {
       final participantRef = database.ref('rooms/$roomId/participants/$userId');
       await participantRef.update({
         'status': status,
-        'lastSeen': DateTime.now().toIso8601String(),
+        'lastSeen': ServerValue.timestamp,
       });
     } on FirebaseException catch (e) {
       throw ServerException('Realtime DB error: ${e.message}');

@@ -4,6 +4,7 @@ import 'package:studyquest/data/datasources/auth_datasource.dart';
 import 'package:studyquest/data/models/user_model.dart';
 import 'package:dartz/dartz.dart';
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, UserModel>> registerWithEmailPassword({
@@ -23,6 +24,8 @@ abstract class AuthRepository {
   Future<Either<Failure, String>> sendOtp(String phoneNumber);
 
   Future<Either<Failure, UserModel>> verifyOtp(String verificationId, String otp);
+
+  Future<Either<Failure, UserModel>> signInWithCredential(AuthCredential credential);
 
   Stream<UserModel?> authStateChanges();
 }
@@ -123,6 +126,18 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserModel>> verifyOtp(String verificationId, String otp) async {
     try {
       final user = await remoteDataSource.verifyOtp(verificationId, otp);
+      return Right(UserModel.fromFirebaseUser(user));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserModel>> signInWithCredential(AuthCredential credential) async {
+    try {
+      final user = await remoteDataSource.signInWithCredential(credential);
       return Right(UserModel.fromFirebaseUser(user));
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
