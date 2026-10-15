@@ -20,20 +20,39 @@
 
 ## Git Workflow
 
-### Branching Strategy
+### Branching Strategy (sesuai SOP/GRC/DEV-COD/2026/002)
 
-- `main` - Production code, always stable
-- `feature/*` - Feature branches for development
-- `bugfix/*` - Bug fix branches
-
-### Commit Message Format
-
-Follow conventional commits:
 ```
-feat: add email authentication
-fix: resolve XP calculation bug
-docs: update architecture documentation
-refactor: clean up quest controller
+main            → production (stabil, tidak boleh di-push langsung)
+  └── develop     → development
+        ├── feat/*     → fitur baru
+        ├── fix/*      → perbaikan bug
+        ├── style/*    → tampilan/UI
+        ├── chore/*    → instalasi/tooling
+        └── hotfix/*   → perbaikan urgent
+```
+
+Aturan:
+- Semua perubahan lewat branch `feat/`, `fix/`, `style/`, `chore/`, atau `hotfix/`
+- Tidak boleh push langsung ke `main`; semua perubahan masuk lewat merge ke `develop`
+- Gunakan `git merge` (atau Merge Request di remote) untuk menggabung ke `develop`
+
+### Commit Message Format (sesuai SOP)
+
+```
+<type>: [XX] short description
+```
+
+- `<type>`: `feat`, `fix`, `style`, `chore`, `hotfix` (sesuai branch)
+- `[XX]`: inisial nama pelaku (misal Riffat Arfa → `[RA]`)
+- `short description`: bahasa Inggris, singkat
+
+Contoh:
+```
+feat: [RA] add app check activation
+fix: [RA] fix duplicate xp awarding
+style: [RA] redesign login screen
+chore: [RA] bump version to 1.1.0-beta.1
 ```
 
 ### Before Committing

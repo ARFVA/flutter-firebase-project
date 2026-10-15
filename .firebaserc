@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "studyquest-firebase",
+    "staging": "studyquest-firebase",
+    "production": "studyquest-firebase"
+  }
+}

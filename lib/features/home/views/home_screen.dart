@@ -6,7 +6,6 @@ import 'package:studyquest/features/profile/controllers/profile_controller.dart'
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 // Utility function to format numbers with K suffix
 String formatNumber(int number) {
@@ -333,12 +332,14 @@ class HomeScreen extends StatelessWidget {
                               const Icon(Icons.emoji_events, color: Colors.black, size: 24),
                               const SizedBox(height: 8),
                               Text(
-                                'L${profile.level}',
+                                formatNumber(profile.level),
                                 style: const TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black,
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                               const Text(
                                 'Level',
@@ -478,136 +479,38 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
+              Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.assignment, size: 32, color: Colors.black),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'My Quests',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          OutlinedButton(
-                            onPressed: () => Get.to(() => const QuestListScreen()),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black,
-                              side: const BorderSide(color: Colors.black),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text('View'),
-                          ),
-                        ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Get.to(() => const QuestListScreen()),
+                      icon: const Icon(Icons.task_alt_rounded),
+                      label: const Text('My Quests'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.refresh, size: 32, color: Colors.black),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Reset XP',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          OutlinedButton(
-                            onPressed: () {
-                              Get.defaultDialog(
-                                title: 'Reset XP',
-                                titleStyle: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.black,
-                                ),
-                                middleText: 'Reset XP to 0? This cannot be undone.',
-                                middleTextStyle: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black87,
-                                ),
-                                textConfirm: 'Reset',
-                                textCancel: 'Cancel',
-                                confirmTextColor: Colors.white,
-                                cancelTextColor: Colors.grey.shade700,
-                                buttonColor: Colors.red.shade700,
-                                radius: 16,
-                                onConfirm: () {
-                                  Get.back();
-                                  profileController.resetXP();
-                                },
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              side: const BorderSide(color: Colors.red),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text('Reset'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(Icons.people, size: 32, color: Colors.black),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Study Room',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          OutlinedButton(
-                            onPressed: () => Get.to(() => const StudyRoomScreen()),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.black,
-                              side: const BorderSide(color: Colors.black),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text('Join'),
-                          ),
-                        ],
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Get.to(() => const StudyRoomScreen()),
+                      icon: const Icon(Icons.group_rounded),
+                      label: const Text('Study Room'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                   ),

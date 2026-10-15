@@ -8,6 +8,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+dependencies {
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+}
+
 android {
     namespace = "com.studyquest.studyquest"
     compileSdk = flutter.compileSdkVersion

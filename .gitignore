@@ -64,3 +64,11 @@ firebase-debug.log.*
 *.key
 *.keystore
 *.jks
+
+# Windows reserved device names (artifact)
+[nu]l
+con
+prn
+aux
+com[1-9]
+lpt[1-9]

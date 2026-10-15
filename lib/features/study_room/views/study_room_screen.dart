@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:studyquest/core/widgets/primary_button.dart';
 import 'package:studyquest/features/study_room/controllers/room_controller.dart';
 import 'package:studyquest/data/models/room_model.dart';
 
@@ -188,14 +190,14 @@ class StudyRoomScreen extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.copy, size: 20),
-                        onPressed: () {
+                        onPressed: () async {
                           // Copy room ID to clipboard
-                          // Note: Need to add flutter/services dependency for clipboard
+                          await Clipboard.setData(ClipboardData(text: roomController.currentRoomId));
                           Get.snackbar(
                             'Room ID',
-                            roomController.currentRoomId,
+                            'Copied to clipboard!',
                             snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.black87,
+                            backgroundColor: Colors.green.shade700,
                             colorText: Colors.white,
                           );
                         },
@@ -327,18 +329,17 @@ class StudyRoomScreen extends StatelessWidget {
             onPressed: () => Get.back(),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          PrimaryButton(
+            label: 'Create',
+            icon: Icons.add,
             onPressed: () {
               if (roomNameController.text.trim().isNotEmpty) {
                 Get.back();
                 controller.createRoom(roomNameController.text.trim());
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade700,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Create'),
+            color: Colors.green.shade700,
+            isFullWidth: false,
           ),
         ],
       ),
@@ -364,18 +365,17 @@ class StudyRoomScreen extends StatelessWidget {
             onPressed: () => Get.back(),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          PrimaryButton(
+            label: 'Join',
+            icon: Icons.login,
             onPressed: () {
               if (roomIdController.text.trim().isNotEmpty) {
                 Get.back();
                 controller.joinRoom(roomIdController.text.trim());
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Join'),
+            color: Colors.green.shade700,
+            isFullWidth: false,
           ),
         ],
       ),

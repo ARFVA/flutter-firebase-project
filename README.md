@@ -25,16 +25,23 @@ A comprehensive Flutter application demonstrating Firebase integration with best
 
 ### Real-time Study Rooms
 - Create and join study rooms
-- Real-time presence tracking
+- Real-time participant sync
+- Presence tracking with `onDisconnect` (auto-offline on disconnect)
 - Status updates (studying/break/offline)
 - Participant management
 
 ### Gamification
-- XP calculation on quest completion
+- XP calculation on quest completion (server-authoritative via Cloud Functions)
 - Level progression
 - Daily target tracking
 - Streak system
 - Activity history
+
+### Push Notifications (FCM)
+- Permission handling (iOS + Android 13+)
+- Foreground notification display
+- Background message handler
+- Per-user topic targeting
 
 ## 📦 Architecture
 
@@ -45,6 +52,8 @@ lib/
 ├── core/
 │   ├── constants/
 │   ├── errors/
+│   ├── services/
+│   ├── theme/
 │   └── utils/
 ├── data/
 │   ├── models/
@@ -62,27 +71,34 @@ lib/
 ## 🔧 Technologies
 
 - **Flutter**: Cross-platform UI framework
-- **GetX**: State management and routing
+- **GetX**: State management, routing, and dependency injection
 - **Firebase Core**: Firebase initialization
-- **Firebase Auth**: Authentication
+- **Firebase Auth**: Authentication (email/password, Google, phone OTP)
 - **Cloud Firestore**: NoSQL database
-- **Firebase Realtime Database**: Real-time data sync
+- **Firebase Realtime Database**: Real-time data sync & presence
 - **Firebase Storage**: File storage
-- **Firebase App Check**: App integrity
+- **Firebase App Check**: App integrity protection
+- **Firebase Cloud Messaging**: Push notifications
+- **Cloud Functions**: Server-side business logic (XP, validation, idempotency)
+- **Cloud SQL PostgreSQL**: Relational data (FK, JOIN, index, transaction)
 - **Dartz**: Functional programming utilities
 
 ## 📋 Firebase Services
 
 ### Firestore Collections
-- `users`: User profiles
-- `quests`: User quests
-- `activities`: Activity history
+- `users`: User profiles (XP/level/streak owned by Cloud Functions)
+- `quests`: User quests (with server-side `xpAwarded` flag)
+- `activities`: Activity history (created only by Cloud Functions)
 - `achievements`: Achievement definitions
 - `user_achievements`: User achievements
 
 ### Realtime Database Structure
 - `rooms/{roomId}`: Study rooms
-- `rooms/{roomId}/participants/{userId}`: Room participants
+- `rooms/{roomId}/participants/{userId}`: Room participants (with presence via `onDisconnect`)
+
+### Cloud SQL (PostgreSQL)
+- `users`, `friendships`, `study_sessions`, `user_stats`, `xp_events`
+- Accessed only through Cloud Functions — see [docs/CLOUD_SQL.md](docs/CLOUD_SQL.md)
 
 ### Storage Buckets
 - `users/{userId}/`: User profile pictures
@@ -91,18 +107,16 @@ lib/
 ## 🔐 Security
 
 ### Implemented
-- Firestore Security Rules
+- Firestore Security Rules (server-authoritative XP/level/streak)
 - Realtime Database Security Rules
 - Firebase Storage Security Rules
-- Firebase App Check
-- Protected routes
-- Input validation
+- Firebase App Check (debug/Play Integrity/DeviceCheck)
+- Cloud Functions for critical logic (XP, streak, validation, idempotency)
+- Protected routes and input validation
 
 ### Planned
-- Cloud Functions for critical logic
-- Rate limiting
-- Server-side validation
-- Secrets management
+- Rate limiting on callable endpoints
+- Enhanced secrets management
 
 ## 🧪 Testing
 
@@ -119,7 +133,7 @@ flutter analyze
 
 ## 📝 Development Phases
 
-The project is developed in phases following the [Phased Development Plan](StudyQuest_Firebase_Phased_Development_Plan.md):
+The project is developed in phases following the [Development Plan](docs/DEVELOPMENT_PLAN.md):
 
 - ✅ Phase 0: Project Planning & Repository Setup
 - ✅ Phase 1: Firebase Setup & Flutter Integration

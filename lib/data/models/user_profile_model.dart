@@ -64,6 +64,19 @@ class UserProfileModel {
     };
   }
 
+  /// Parses date values that may be ISO-8601 [String] (client writes) or a
+  /// Firestore [Timestamp] (server/Cloud Functions writes).
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    try {
+      return (value as dynamic).toDate() as DateTime;
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
   factory UserProfileModel.fromMap(Map<String, dynamic> map) {
     return UserProfileModel(
       uid: map['uid'] ?? '',
@@ -75,8 +88,8 @@ class UserProfileModel {
       xp: map['xp'] ?? 0,
       dailyTargetXp: map['dailyTargetXp'] ?? 500,
       streak: map['streak'] ?? 0,
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(map['updatedAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: _parseDate(map['createdAt']),
+      updatedAt: _parseDate(map['updatedAt']),
     );
   }
 

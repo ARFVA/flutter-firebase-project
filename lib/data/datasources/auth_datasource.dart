@@ -21,6 +21,8 @@ abstract class AuthRemoteDataSource {
 
   Future<User> verifyOtp(String verificationId, String otp);
 
+  Future<User> signInWithCredential(AuthCredential credential);
+
   Stream<User?> authStateChanges();
 }
 
@@ -112,7 +114,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         },
       );
       
-      return completer.future;
+      return await completer.future;
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -126,6 +128,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         smsCode: otp,
       );
       
+      final userCredential = await firebaseAuth.signInWithCredential(credential);
+      return userCredential.user!;
+    } on FirebaseAuthException catch (e) {
+      throw ServerException(_getAuthErrorMessage(e));
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<User> signInWithCredential(AuthCredential credential) async {
+    try {
       final userCredential = await firebaseAuth.signInWithCredential(credential);
       return userCredential.user!;
     } on FirebaseAuthException catch (e) {

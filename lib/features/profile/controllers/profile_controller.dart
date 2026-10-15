@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
@@ -19,10 +20,18 @@ class ProfileController extends GetxController {
   // Allow direct access to the observable for reactive updates
   Rx<UserProfileModel?> get profileObservable => _profile;
 
+  StreamSubscription<UserProfileModel?>? _profileSubscription;
+
   @override
   void onInit() {
     super.onInit();
     loadProfile();
+  }
+
+  @override
+  void onClose() {
+    _profileSubscription?.cancel();
+    super.onClose();
   }
 
   Future<void> loadProfile() async {
@@ -35,11 +44,36 @@ class ProfileController extends GetxController {
 
     result.fold(
       (failure) {
+        // If profile doesn't exist, create default
+        _profile.value = UserProfileModel.create(
+          uid: user.uid,
+          displayName: user.displayName ?? user.email?.split('@')[0] ?? 'User',
+          email: user.email ?? '',
+          photoURL: user.photoURL,
+          phoneNumber: user.phoneNumber,
+        );
         _isLoading.value = false;
       },
       (profile) {
         _profile.value = profile;
         _isLoading.value = false;
+        _watchProfile(user.uid);
+      },
+    );
+  }
+
+  /// Subscribes to profile snapshots so server-side XP/level/streak updates
+  /// (awarded by Cloud Functions) appear in the UI without manual refresh.
+  void _watchProfile(String uid) {
+    _profileSubscription?.cancel();
+    _profileSubscription = repository.watchUserProfile(uid).listen(
+      (profile) {
+        if (profile != null) {
+          _profile.value = profile;
+        }
+      },
+      onError: (Object e) {
+        debugPrint('Profile watch error: $e');
       },
     );
   }
@@ -47,6 +81,16 @@ class ProfileController extends GetxController {
   Future<void> updateDailyTarget(int newTarget) async {
     final user = authController.currentUser;
     if (user == null || _profile.value == null) return;
+
+    // Validate input (client-side guard; server re-validates on write)
+    if (newTarget < 50 || newTarget > 10000) {
+      Get.snackbar(
+        'Invalid',
+        'Daily target must be between 50 and 10,000 XP',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
     _isLoading.value = true;
 
@@ -119,46 +163,5 @@ class ProfileController extends GetxController {
   // Force refresh profile from Firestore
   Future<void> forceRefresh() async {
     await loadProfile();
-  }
-
-  // Reset XP to reasonable value (for debugging/testing)
-  Future<void> resetXP() async {
-    final user = authController.currentUser;
-    if (user == null || _profile.value == null) return;
-
-    _isLoading.value = true;
-
-    final resetProfile = _profile.value!.copyWith(
-      xp: 0,
-      level: 1,
-      streak: 0,
-      updatedAt: DateTime.now(),
-    );
-
-    final result = await repository.updateUserProfile(resetProfile);
-
-    result.fold(
-      (failure) {
-        _isLoading.value = false;
-        Get.snackbar(
-          'Error',
-          failure.message,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.shade700,
-          colorText: Colors.white,
-        );
-      },
-      (_) {
-        _profile.value = resetProfile;
-        _isLoading.value = false;
-        Get.snackbar(
-          'Success',
-          'XP reset to 0',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.shade700,
-          colorText: Colors.white,
-        );
-      },
-    );
   }
 }

@@ -1,7 +1,42 @@
 # Changelog
 
-All notable changes to **StudyQuest** are documented in this file.
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Semua perubahan penting dalam projek **StudyQuest**.
+Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [1.1.0-beta.1] - 2026-10-15
+
+### Added
+- Firebase App Check aktif (debug provider untuk debug, Play Integrity/DeviceCheck untuk release)
+- Presence Realtime Database dengan `onDisconnect()` (user otomatis offline saat koneksi terputus)
+- FCM background handler (`@pragma('vm:entry-point')`) dan tampilan notifikasi foreground via `flutter_local_notifications`
+- Penyimpanan FCM token ke profil user + subscribe topic `user_{uid}` untuk push terarah
+- Cloud Functions idempoten: `onQuestComplete` dengan transaction + guard `xpAwarded` (XP tidak mungkin dobel)
+- Logika streak server-side (`lastStreakDate`) dan `dailyStreakCheck` yang benar-benar me-reset streak basi
+- Validasi server-side pada pembuatan user (panjang displayName, sanitasi email)
+- Cloud SQL PostgreSQL: skema relasional (`users`, `friendships`, `study_sessions`, `user_stats`, `xp_events`) dengan foreign key, index, unique constraint
+- Callable Functions `recordStudySession` (transaction + idempotency key) dan `getFriendLeaderboard` (JOIN + index)
+- Sync trigger `syncUserToSql` untuk menjaga baris `users` di Cloud SQL konsisten dengan Firebase Auth
+- Feature flag `ENABLE_CLOUD_SQL` (default false) sesuai SOP environment gating
+- Theme Material 3 terpusat (`core/theme/app_theme.dart`) dengan indigo-violet gradient
+- Stream reaktif profil user (`watchUserProfile`) sehingga XP/level/streak ter-update live dari server
+- Permission Android `POST_NOTIFICATIONS` dan `INTERNET` untuk FCM
+
+### Changed
+- Alur penyelesaian quest menjadi server-authoritative: klien hanya menandai `isCompleted`, Cloud Function yang menghitung XP/level/streak
+- Firestore Security Rules memblokir klien mengubah `xp`, `level`, `streak`, `lastStreakDate`, `xpAwarded`, `createdAt`, `uid`
+- Realtime Database rules mematikan akses baca publik dan mengizinkan presence write per-participant
+- Login screen didesain ulang dengan gradient hero, kartu glassmorphism, dan tombol sosial yang konsisten
+- `main.dart` mengaktifkan App Check dan memakai FCMService.instance (menghilangkan duplikasi init)
+- Model `UserProfileModel`, `ActivityModel`, `ParticipantModel` menangani timestamp Firestore (String/ Timestamp/epoch) dengan aman
+
+### Removed
+- Perhitungan XP/klien-side streak (duplikasi logika) — kini seluruhnya di Cloud Functions
+- Tombol & method `resetXP` debug dari home screen dan ProfileController
+
+### Security
+- App Check melindungi Firestore, Realtime Database, Storage, dan Cloud Functions dari abuse
+- Klien tidak lagi bisa memanipulasi XP/level/streak melalui aturan security rules
+- Aktivitas dibuat hanya oleh Cloud Functions (klien read-only)
 
 ## [1.0.0-beta.1] - 2026-10-08
 
