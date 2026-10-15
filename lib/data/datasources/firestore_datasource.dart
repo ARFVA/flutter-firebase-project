@@ -6,6 +6,7 @@ import 'package:studyquest/data/models/user_profile_model.dart';
 abstract class FirestoreRemoteDataSource {
   Future<void> createUserProfile(UserProfileModel profile);
   Future<UserProfileModel?> getUserProfile(String uid);
+  Stream<UserProfileModel?> watchUserProfile(String uid);
   Future<void> updateUserProfile(UserProfileModel profile);
   Future<void> deleteUserProfile(String uid);
 }
@@ -50,12 +51,31 @@ class FirestoreRemoteDataSourceImpl implements FirestoreRemoteDataSource {
   }
 
   @override
+  Stream<UserProfileModel?> watchUserProfile(String uid) {
+    return firestore
+        .collection(FirebaseConstants.usersCollection)
+        .doc(uid)
+        .snapshots()
+        .where((doc) => doc.exists)
+        .map((doc) => UserProfileModel.fromMap(doc.data()!));
+  }
+
+  @override
   Future<void> updateUserProfile(UserProfileModel profile) async {
     try {
+      // Only client-editable fields are sent. XP/level/streak are owned by
+      // Cloud Functions (server-authoritative) and blocked by security rules.
       await firestore
           .collection(FirebaseConstants.usersCollection)
           .doc(profile.uid)
-          .update(profile.toMap()..['updatedAt'] = DateTime.now().toIso8601String());
+          .update({
+        'displayName': profile.displayName,
+        'email': profile.email,
+        'photoURL': profile.photoURL,
+        'phoneNumber': profile.phoneNumber,
+        'dailyTargetXp': profile.dailyTargetXp,
+        'updatedAt': DateTime.now().toIso8601String(),
+      });
     } on FirebaseException catch (e) {
       throw ServerException('Firestore error: ${e.message}');
     } catch (e) {

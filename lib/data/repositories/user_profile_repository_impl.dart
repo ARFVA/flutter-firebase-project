@@ -7,6 +7,7 @@ import 'package:dartz/dartz.dart';
 abstract class UserProfileRepository {
   Future<Either<Failure, void>> createUserProfile(UserProfileModel profile);
   Future<Either<Failure, UserProfileModel?>> getUserProfile(String uid);
+  Stream<UserProfileModel?> watchUserProfile(String uid);
   Future<Either<Failure, void>> updateUserProfile(UserProfileModel profile);
   Future<Either<Failure, void>> deleteUserProfile(String uid);
 }
@@ -38,6 +39,11 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
+  }
+
+  @override
+  Stream<UserProfileModel?> watchUserProfile(String uid) {
+    return remoteDataSource.watchUserProfile(uid);
   }
 
   @override

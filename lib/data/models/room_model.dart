@@ -78,12 +78,22 @@ class ParticipantModel {
     };
   }
 
+  /// Parses lastSeen which may be an ISO-8601 [String] (client write) or a
+  /// millisecond epoch [int] (RTDB [ServerValue.timestamp] server write).
+  static DateTime _parseLastSeen(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is DateTime) return value;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    return DateTime.now();
+  }
+
   factory ParticipantModel.fromMap(Map<String, dynamic> map) {
     return ParticipantModel(
       userId: map['userId'] ?? '',
       displayName: map['displayName'] ?? '',
       status: map['status'] ?? 'offline',
-      lastSeen: DateTime.parse(map['lastSeen'] ?? DateTime.now().toIso8601String()),
+      lastSeen: _parseLastSeen(map['lastSeen']),
     );
   }
 

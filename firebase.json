@@ -23,17 +23,35 @@
     }
   },
   "firestore": {
-    "rules": "docs/firestore.rules",
+    "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
   "database": {
     "rules": "database.rules.json"
   },
   "storage": {
-    "rules": "docs/storage.rules"
+    "rules": "storage.rules"
   },
   "functions": {
     "source": "functions",
     "runtime": "nodejs18"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "database": {
+      "port": 9000
+    },
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
   }
 }

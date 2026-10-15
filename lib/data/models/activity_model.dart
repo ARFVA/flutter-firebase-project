@@ -43,6 +43,19 @@ class ActivityModel {
     };
   }
 
+  /// Parses date values that may be ISO-8601 [String] (client writes) or a
+  /// Firestore [Timestamp] (server/Cloud Functions writes).
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    try {
+      return (value as dynamic).toDate() as DateTime;
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
   factory ActivityModel.fromMap(Map<String, dynamic> map) {
     return ActivityModel(
       id: map['id'] ?? '',
@@ -50,7 +63,7 @@ class ActivityModel {
       type: map['type'] ?? '',
       description: map['description'] ?? '',
       xpGained: map['xpGained'] ?? 0,
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: _parseDate(map['createdAt']),
     );
   }
 }

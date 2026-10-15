@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:studyquest/core/services/fcm_service.dart';
 import 'package:studyquest/data/models/user_model.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
 import 'package:studyquest/data/repositories/auth_repository_impl.dart';
 import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AuthController extends GetxController {
   final AuthRepository repository;
@@ -37,6 +40,9 @@ class AuthController extends GetxController {
       _currentUser.value = user;
       if (user != null && Get.currentRoute != '/home') {
         Get.offAllNamed('/home');
+        // Persist FCM token so backend can push to this device.
+        FCMService.instance.saveTokenToProfile(user.uid);
+        FCMService.instance.subscribeToUserTopic(user.uid);
       } else if (user == null && Get.currentRoute != '/login') {
         Get.offAllNamed('/login');
       }
@@ -223,7 +229,7 @@ class AuthController extends GetxController {
       await firebaseUser.reload();
       var userModel = UserModel.fromFirebaseUser(firebaseUser);
       // Update display name from profile if available
-      if (profile != null && profile.displayName != null) {
+      if (profile != null) {
         userModel = userModel.copyWith(displayName: profile.displayName);
       }
       _currentUser.value = userModel;
@@ -310,5 +316,107 @@ class AuthController extends GetxController {
         Get.offAllNamed('/home');
       },
     );
+  }
+
+  Future<void> signInWithGoogle() async {
+    _isLoading.value = true;
+    _errorMessage.value = '';
+
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        _isLoading.value = false;
+        return;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in with the credential
+      final result = await repository.signInWithCredential(credential);
+
+      result.fold(
+        (failure) {
+          _errorMessage.value = failure.message;
+          _isLoading.value = false;
+          Get.snackbar(
+            'Error',
+            failure.message,
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade700,
+            colorText: Colors.white,
+          );
+        },
+        (user) async {
+          // Check if user profile exists, create if not
+          final profileResult = await userProfileRepository.getUserProfile(user.uid);
+          
+          profileResult.fold(
+            (failure) async {
+              // Profile doesn't exist, create it
+              final displayName = user.displayName ?? user.email?.split('@')[0] ?? 'User';
+              final profile = UserProfileModel.create(
+                uid: user.uid,
+                displayName: displayName,
+                email: user.email ?? '',
+                photoURL: user.photoURL,
+                phoneNumber: user.phoneNumber,
+              );
+              await userProfileRepository.createUserProfile(profile);
+            },
+            (profile) {
+              // Profile exists, do nothing
+            },
+          );
+
+          _isLoading.value = false;
+          Get.snackbar(
+            'Success',
+            'Google sign in successful!',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green.shade700,
+            colorText: Colors.white,
+          );
+          Get.offAllNamed('/home');
+        },
+      );
+    } catch (e) {
+      _errorMessage.value = e.toString();
+      _isLoading.value = false;
+      Get.snackbar(
+        'Error',
+        'Google sign in failed',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade700,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> requestNotificationPermission() async {
+    final messaging = FirebaseMessaging.instance;
+    
+    // Request permission for iOS
+    await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    // Get FCM token
+    final token = await messaging.getToken();
+    debugPrint('FCM Token: $token');
   }
 }

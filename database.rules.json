@@ -1,15 +1,17 @@
 {
   "rules": {
-    ".read": true,
+    ".read": false,
     ".write": false,
     "rooms": {
       ".read": "auth != null",
       "$roomId": {
         ".read": "auth != null",
-        ".write": "auth != null && newData.child('createdBy').val() == auth.uid",
+        ".write": "auth != null && (!data.exists || newData.child('createdBy').val() == auth.uid || data.child('createdBy').val() == auth.uid)",
         "participants": {
+          ".read": "auth != null",
+          ".write": "auth != null",
           "$userId": {
-            ".read": "auth != null && auth.uid == $userId",
+            ".read": "auth != null",
             ".write": "auth != null && auth.uid == $userId"
           }
         }

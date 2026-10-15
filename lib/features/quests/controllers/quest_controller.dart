@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/quest_model.dart';
-import 'package:studyquest/data/models/activity_model.dart';
 import 'package:studyquest/data/repositories/quest_repository_impl.dart';
 import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
-import 'package:studyquest/data/repositories/activity_repository_impl.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/profile/controllers/profile_controller.dart';
-import 'package:studyquest/core/utils/gamification_utils.dart';
 import 'package:uuid/uuid.dart';
 
 class QuestController extends GetxController {
   final QuestRepository repository;
   final AuthController authController;
   final UserProfileRepository userProfileRepository;
-  final ActivityRepository activityRepository;
   final ProfileController profileController;
 
   QuestController(
     this.repository,
     this.authController,
     this.userProfileRepository,
-    this.activityRepository,
     this.profileController,
   );
 
@@ -202,6 +197,13 @@ class QuestController extends GetxController {
     );
   }
 
+  /// Marks a quest as completed.
+  ///
+  /// Server-authoritative flow: the client only flips [QuestModel.isCompleted].
+  /// The `onQuestComplete` Cloud Function validates the transition, awards XP,
+  /// updates level/streak, and records the activity exactly once (idempotent).
+  /// The profile UI updates reactively through [ProfileController]'s snapshot
+  /// subscription, so no client-side XP math is performed here.
   Future<void> completeQuest(String questId) async {
     _isLoading.value = true;
     _errorMessage.value = '';
@@ -212,9 +214,9 @@ class QuestController extends GetxController {
       return;
     }
 
-    // Get quest details
+    // Get quest details (guard: only owner can complete, and only once).
     final questResult = await repository.getQuest(questId);
-    
+
     questResult.fold(
       (failure) {
         _errorMessage.value = failure.message;
@@ -228,12 +230,12 @@ class QuestController extends GetxController {
         );
       },
       (quest) async {
-        if (quest == null || quest.isCompleted) {
+        if (quest == null || quest.isCompleted || quest.userId != user.uid) {
           _isLoading.value = false;
           return;
         }
 
-        // Complete the quest
+        // Only mark completion; XP is awarded server-side.
         final completeResult = await repository.completeQuest(questId);
 
         completeResult.fold(
@@ -248,98 +250,19 @@ class QuestController extends GetxController {
               colorText: Colors.white,
             );
           },
-          (_) async {
-            // Get user profile
-            final profileResult = await userProfileRepository.getUserProfile(user.uid);
-            
-            profileResult.fold(
-              (failure) {
-                _errorMessage.value = failure.message;
-                _isLoading.value = false;
-                Get.snackbar(
-                  'Error',
-                  failure.message,
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.red.shade700,
-                  colorText: Colors.white,
-                );
-              },
-              (profile) async {
-                if (profile == null) {
-                  _isLoading.value = false;
-                  return;
-                }
-
-                // Calculate new XP and level
-                final newXP = profile.xp + quest.xp;
-                final newLevel = GamificationUtils.calculateLevel(newXP);
-                final leveledUp = newLevel > profile.level;
-
-                // Update user profile
-                final updatedProfile = profile.copyWith(
-                  xp: newXP,
-                  level: newLevel,
-                  updatedAt: DateTime.now(),
-                );
-
-                await userProfileRepository.updateUserProfile(updatedProfile);
-
-                // Update local profile state immediately
-                profileController.updateProfileState(updatedProfile);
-
-                // Wait a bit for Firestore to propagate, then reload to be safe
-                await Future.delayed(const Duration(milliseconds: 500));
-                await profileController.forceRefresh();
-
-                // Create activity record
-                final activityId = const Uuid().v4();
-                final activity = ActivityModel.create(
-                  id: activityId,
-                  userId: user.uid,
-                  type: 'quest_complete',
-                  description: 'Completed "${quest.title}"',
-                  xpGained: quest.xp,
-                );
-
-                await activityRepository.createActivity(activity);
-
-                // Check daily target and update streak
-                final todayXpResult = await activityRepository.getTodayXp(user.uid);
-                todayXpResult.fold(
-                  (failure) {},
-                  (todayXp) async {
-                    if (GamificationUtils.isDailyTargetMet(todayXp, profile.dailyTargetXp)) {
-                      // Update streak (simplified - in production this should be server-side)
-                      final updatedStreakProfile = updatedProfile.copyWith(
-                        streak: profile.streak + 1,
-                        updatedAt: DateTime.now(),
-                      );
-                      await userProfileRepository.updateUserProfile(updatedStreakProfile);
-                    }
-                  },
-                );
-
-                _isLoading.value = false;
-                
-                // Refresh profile to update XP on home screen
-                profileController.loadProfile();
-                
-                String message = 'Quest completed! +${quest.xp} XP';
-                if (leveledUp) {
-                  message += '\n🎉 Level Up! You are now level $newLevel';
-                }
-                
-                Get.snackbar(
-                  'Success',
-                  message,
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green.shade700,
-                  colorText: Colors.white,
-                  duration: const Duration(seconds: 3),
-                );
-                loadQuests();
-              },
+          (_) {
+            _isLoading.value = false;
+            Get.snackbar(
+              'Success',
+              'Quest completed! +${quest.xp} XP (verifying...)',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.green.shade700,
+              colorText: Colors.white,
+              duration: const Duration(seconds: 3),
             );
+            loadQuests();
+            // Server (Cloud Function) updates the profile asynchronously;
+            // the reactive snapshot in ProfileController picks it up.
           },
         );
       },
