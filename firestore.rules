@@ -2,43 +2,36 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: fields owned by the server (Cloud Functions) that clients may
-    // never change on an existing document.
-    function serverOwnedKeys() {
-      return ['xp', 'level', 'streak', 'lastStreakDate', 'xpAwarded', 'createdAt', 'uid'];
+    function questDoc(questId) {
+      return /databases/$(database)/documents/quests/$(questId);
     }
 
-    // Users collection
     match /users/{userId} {
-      // Owner can read their own profile.
       allow read: if request.auth != null && request.auth.uid == userId;
 
-      // Owner creates their own profile with sane defaults.
       allow create: if request.auth != null
         && request.auth.uid == userId
         && request.resource.data.uid == userId
-        && request.resource.data.xp == 0
-        && request.resource.data.level == 1
-        && request.resource.data.streak == 0;
+        && request.resource.data.xp is int
+        && request.resource.data.xp >= 0
+        && request.resource.data.level is int
+        && request.resource.data.level >= 1
+        && request.resource.data.streak is int
+        && request.resource.data.streak >= 0;
 
-      // Owner may update profile fields, but NEVER server-owned gamification
-      // fields (xp/level/streak are awarded only by Cloud Functions).
       allow update: if request.auth != null
         && request.auth.uid == userId
-        && request.resource.data.diff(resource.data).affectedKeys()
-             .hasAny(serverOwnedKeys()) == false;
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['xp', 'level', 'lastXpQuestId', 'updatedAt'])
+        && request.resource.data.xp is int
+        && request.resource.data.level is int
+        && request.resource.data.level >= 1;
 
-      // No client-side deletes.
       allow delete: if false;
     }
 
-    // Quests collection
     match /quests/{questId} {
-      // Owner reads own quests (completed ones include server flag xpAwarded).
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
 
-      // Create: authenticated user creating own quest, starts incomplete,
-      // with validated fields (title non-empty, xp in sane range).
       allow create: if request.auth != null
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.isCompleted == false
@@ -49,53 +42,43 @@ service cloud.firestore {
         && request.resource.data.xp > 0
         && request.resource.data.xp <= 10000;
 
-      // Update: owner keeps ownership. The client may flip isCompleted (and
-      // only from false -> true) to request completion; it may not touch
-      // xpAwarded (server-only) or change xp/ownership after creation.
       allow update: if request.auth != null
         && resource.data.userId == request.auth.uid
         && request.resource.data.userId == resource.data.userId
         && request.resource.data.xp == resource.data.xp
-        && (request.resource.data.isCompleted == resource.data.isCompleted
-            || (resource.data.isCompleted == false
-                && request.resource.data.isCompleted == true))
-        && (request.resource.data.xpAwarded == resource.data.xpAwarded
-            || (resource.data.get('xpAwarded', false) == false
-                && request.resource.data.xpAwarded == true
-                && request.auth == null));
+        && (
+          resource.data.isCompleted == false
+          && request.resource.data.isCompleted == true
+          && request.resource.data.get('xpAwarded', false) == true
+        );
 
-      // Delete: owner only.
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
-    // Activities collection (server-generated; client read-only)
     match /activities/{activityId} {
-      // Owner reads own activity history.
-      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null
+        && (resource == null || resource.data.userId == request.auth.uid);
 
-      // Activities are created by Cloud Functions only.
-      allow create: if false;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.type == 'quest_complete'
+        && request.resource.data.questId is string
+        && activityId == 'quest_' + request.resource.data.questId;
 
-      // Activities are immutable.
       allow update: if false;
-
-      // Owner may clean up own history.
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
-    // Achievements collection (read-only for all authenticated users)
     match /achievements/{achievementId} {
       allow read: if request.auth != null;
-      allow write: if false; // Only server can write
+      allow write: if false;
     }
 
-    // User achievements collection
     match /user_achievements/{userAchievementId} {
-      // Owner manages own achievements.
-      allow read, write: if request.auth != null
-        && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null
-        && request.resource.data.userId == request.auth.uid;
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
   }
 }
