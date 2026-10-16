@@ -3,6 +3,29 @@
 Semua perubahan penting dalam projek **StudyQuest**.
 Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+# Changelog
+
+Semua perubahan penting dalam projek **StudyQuest**.
+Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## [1.1.0-beta.4] - 2026-10-16
+
+### Fixed
+- Fixed quest completion permission errors by matching Firestore rules to the app transaction flow
+- Kept XP, level, and quest completion updates aligned with authenticated ownership rules
+- Preserved a clean controller architecture and removed duplicate empty feature controller files
+
+### Changed
+- Centralized controller logic under `lib/controllers/` and kept feature folders focused on screen concerns
+- Kept the project aligned with the company SOP for branch, versioning, and commit conventions
+
+### Security
+- Limited user XP edits to authenticated owner writes and kept activity writes controlled to the quest-completion flow
+# Changelog
+
+Semua perubahan penting dalam projek **StudyQuest**.
+Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
 ## [1.1.0-beta.3] - 2026-10-16
 
 ### Changed
@@ -248,3 +271,4 @@ Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - Updated main.dart with GetX integration
 - Updated tests to match new app structure
+

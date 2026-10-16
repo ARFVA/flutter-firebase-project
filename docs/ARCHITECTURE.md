@@ -174,15 +174,11 @@ Quest Controller
   ↓
 Quest Repository
   ↓
-Cloud Function (Callable)
+Firestore transaction
   ↓
-Validation
+Security rules validate ownership, immutable reward, and one-time award
   ↓
-Firestore Update
-  ↓
-XP Calculation
-  ↓
-Activity Creation
+Quest + profile XP/level + activity updated atomically
   ↓
 Response to Client
 ```

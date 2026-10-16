@@ -66,6 +66,17 @@ class QuestModel {
     };
   }
 
+  static DateTime _parseDate(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    try {
+      return (value as dynamic).toDate() as DateTime;
+    } catch (_) {
+      return DateTime.now();
+    }
+  }
+
   factory QuestModel.fromMap(Map<String, dynamic> map) {
     return QuestModel(
       id: map['id'] ?? '',
@@ -76,9 +87,11 @@ class QuestModel {
       xp: map['xp'] ?? 0,
       durationMinutes: map['durationMinutes'],
       isCompleted: map['isCompleted'] ?? false,
-      createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(map['updatedAt'] ?? DateTime.now().toIso8601String()),
-      completedAt: map['completedAt'] != null ? DateTime.parse(map['completedAt']) : null,
+      createdAt: _parseDate(map['createdAt']),
+      updatedAt: _parseDate(map['updatedAt']),
+      completedAt: map['completedAt'] != null
+          ? _parseDate(map['completedAt'])
+          : null,
     );
   }
 

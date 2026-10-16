@@ -214,13 +214,7 @@ class QuestController extends GetxController {
     );
   }
 
-  /// Marks a quest as completed.
-  ///
-  /// Server-authoritative flow: the client only flips [QuestModel.isCompleted].
-  /// The `onQuestComplete` Cloud Function validates the transition, awards XP,
-  /// updates level/streak, and records the activity exactly once (idempotent).
-  /// The profile UI updates reactively through [ProfileController]'s snapshot
-  /// subscription, so no client-side XP math is performed here.
+  /// Completes and awards XP through an authenticated, idempotent server call.
   Future<void> completeQuest(String questId) async {
     _isLoading.value = true;
     _errorMessage.value = '';
@@ -231,7 +225,7 @@ class QuestController extends GetxController {
       return;
     }
 
-    // Get quest details (guard: only owner can complete, and only once).
+    // Load quest details for ownership validation before calling the server.
     final questResult = await repository.getQuest(questId);
 
     questResult.fold(
@@ -247,13 +241,15 @@ class QuestController extends GetxController {
         );
       },
       (quest) async {
-        if (quest == null || quest.isCompleted || quest.userId != user.uid) {
+        if (quest == null || quest.userId != user.uid) {
           _isLoading.value = false;
           return;
         }
 
-        // Only mark completion; XP is awarded server-side.
-        final completeResult = await repository.completeQuest(questId);
+        final completeResult = await repository.completeQuest(
+          questId,
+          user.uid,
+        );
 
         completeResult.fold(
           (failure) {
@@ -267,19 +263,20 @@ class QuestController extends GetxController {
               colorText: Colors.white,
             );
           },
-          (_) {
+          (completion) {
             _isLoading.value = false;
+            final message = completion.xpAwarded > 0
+                ? 'Quest completed! +${completion.xpAwarded} XP'
+                : 'Quest was already completed. Total XP: ${completion.totalXp}';
             Get.snackbar(
               'Success',
-              'Quest completed! +${quest.xp} XP (verifying...)',
+              message,
               snackPosition: SnackPosition.BOTTOM,
               backgroundColor: Colors.green.shade700,
               colorText: Colors.white,
               duration: const Duration(seconds: 3),
             );
             loadQuests();
-            // XP and daily progress update when the Cloud Function writes the
-            // authoritative profile and activity records.
           },
         );
       },

@@ -1,6 +1,7 @@
 import 'package:studyquest/core/errors/failures.dart';
 import 'package:studyquest/core/errors/exceptions.dart';
 import 'package:studyquest/data/datasources/quest_datasource.dart';
+import 'package:studyquest/data/models/quest_completion_result.dart';
 import 'package:studyquest/data/models/quest_model.dart';
 import 'package:dartz/dartz.dart';
 
@@ -10,7 +11,10 @@ abstract class QuestRepository {
   Future<Either<Failure, QuestModel?>> getQuest(String questId);
   Future<Either<Failure, void>> updateQuest(QuestModel quest);
   Future<Either<Failure, void>> deleteQuest(String questId);
-  Future<Either<Failure, void>> completeQuest(String questId);
+  Future<Either<Failure, QuestCompletionResult>> completeQuest(
+    String questId,
+    String userId,
+  );
   Future<Either<Failure, List<QuestModel>>> getActiveQuests(String userId);
   Future<Either<Failure, List<QuestModel>>> getCompletedQuests(String userId);
 }
@@ -81,10 +85,13 @@ class QuestRepositoryImpl implements QuestRepository {
   }
 
   @override
-  Future<Either<Failure, void>> completeQuest(String questId) async {
+  Future<Either<Failure, QuestCompletionResult>> completeQuest(
+    String questId,
+    String userId,
+  ) async {
     try {
-      await remoteDataSource.completeQuest(questId);
-      return const Right(null);
+      final completion = await remoteDataSource.completeQuest(questId, userId);
+      return Right(completion);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
