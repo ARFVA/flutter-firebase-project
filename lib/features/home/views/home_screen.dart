@@ -1,86 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:studyquest/features/auth/controllers/auth_controller.dart';
-import 'package:studyquest/features/profile/controllers/profile_controller.dart';
+import 'package:studyquest/core/theme/app_theme.dart';
+import 'package:studyquest/core/utils/formatters.dart';
+import 'package:studyquest/core/utils/gamification_utils.dart';
+import 'package:studyquest/controllers/auth_controller.dart';
+import 'package:studyquest/controllers/profile_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/study_room/views/study_room_screen.dart';
 import 'package:studyquest/data/models/user_profile_model.dart';
 
-// Utility function to format numbers with K suffix
-String formatNumber(int number) {
-  if (number >= 1000000000) {
-    return '${(number / 1000000000).toStringAsFixed(1)}B';
-  } else if (number >= 1000000) {
-    return '${(number / 1000000).toStringAsFixed(1)}M';
-  } else if (number >= 1000) {
-    return '${(number / 1000).toStringAsFixed(1)}K';
-  } else {
-    return number.toString();
-  }
-}
-
-// Utility function to format numbers with thousands separator
-String formatNumberWithSeparator(int number) {
-  final buffer = StringBuffer();
-  final numberStr = number.toString();
-  int length = numberStr.length;
-
-  for (int i = 0; i < length; i++) {
-    if (i > 0 && (length - i) % 3 == 0) {
-      buffer.write('.');
-    }
-    buffer.write(numberStr[i]);
-  }
-
-  return buffer.toString();
-}
-
-// Input formatter for thousands separator
-class ThousandsSeparatorInputFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    // Remove all non-digit characters
-    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
-    
-    if (digits.isEmpty) {
-      return newValue.copyWith(text: '');
-    }
-    
-    // Format with thousands separator
-    final buffer = StringBuffer();
-    for (int i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) {
-        buffer.write('.');
-      }
-      buffer.write(digits[i]);
-    }
-    
-    return TextEditingValue(
-      text: buffer.toString(),
-      selection: TextSelection.collapsed(offset: buffer.length),
-    );
-  }
-}
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  void _showEditNameDialog(UserProfileModel? profile, dynamic user, ProfileController profileController, AuthController authController) {
-    final nameController = TextEditingController(text: profile?.displayName ?? user.displayName ?? '');
+  void _showEditNameDialog(
+    UserProfileModel? profile,
+    dynamic user,
+    ProfileController profileController,
+    AuthController authController,
+  ) {
+    final nameController = TextEditingController(
+      text: profile?.displayName ?? user.displayName ?? '',
+    );
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
           'Edit Display Name',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: Color(0xFF111827),
           ),
         ),
         content: TextField(
@@ -88,69 +37,72 @@ class HomeScreen extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Display Name',
             hintText: 'Enter your name',
-            filled: true,
-            fillColor: Colors.grey.shade100,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Colors.blue, width: 2),
-            ),
+            prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
+            prefixIconColor: AppTheme.primaryColor,
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade700,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-          ElevatedButton(
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          FilledButton(
             onPressed: () async {
-              if (nameController.text.trim().isNotEmpty) {
-                // Close dialog first
-                Get.back();
+              final trimmedName = nameController.text.trim();
+              if (trimmedName.isEmpty) {
+                return;
+              }
 
-                // Update profile name in Firestore only (skip Firebase Auth to avoid certificate error)
-                if (profile != null) {
-                  final updatedProfile = profile.copyWith(
-                    displayName: nameController.text.trim(),
-                    updatedAt: DateTime.now(),
-                  );
-                  await profileController.updateUserProfile(updatedProfile);
+              Get.back();
 
-                  // Refresh auth controller with updated profile display name
-                  await authController.refreshCurrentUserWithProfile(updatedProfile);
-                }
-
-                // Reload profile data
-                await profileController.loadProfile();
-
-                // Show success message
-                Get.snackbar(
-                  'Success',
-                  'Display name updated!',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green.shade700,
-                  colorText: Colors.white,
-                  borderRadius: 12,
-                  margin: const EdgeInsets.all(16),
+              if (profile != null) {
+                final updatedProfile = profile.copyWith(
+                  displayName: trimmedName,
+                  updatedAt: DateTime.now(),
+                );
+                await profileController.updateUserProfile(updatedProfile);
+                await authController.refreshCurrentUserWithProfile(
+                  updatedProfile,
                 );
               }
+
+              await profileController.loadProfile();
+
+              Get.snackbar(
+                'Success',
+                'Display name updated!',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.green.shade700,
+                colorText: Colors.white,
+                borderRadius: 12,
+                margin: const EdgeInsets.all(16),
+              );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue.shade700,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
             ),
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w600)),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSignOutDialog(AuthController authController) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Sign out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              Get.back();
+              authController.logout();
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Sign out'),
           ),
         ],
       ),
@@ -163,18 +115,19 @@ class HomeScreen extends StatelessWidget {
     final profileController = Get.find<ProfileController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
         title: Row(
           children: [
-            const Icon(Icons.auto_stories_rounded, color: Colors.black, size: 28),
+            const Icon(
+              Icons.auto_stories_rounded,
+              color: AppTheme.primaryColor,
+              size: 28,
+            ),
             const SizedBox(width: 12),
             const Text(
               'StudyQuest',
               style: TextStyle(
-                color: Colors.black,
+                color: AppTheme.primaryColor,
                 fontWeight: FontWeight.w800,
                 fontSize: 22,
               ),
@@ -183,22 +136,11 @@ class HomeScreen extends StatelessWidget {
         ),
         actions: [
           TextButton.icon(
-            onPressed: () {
-              Get.defaultDialog(
-                title: 'Sign out',
-                middleText: 'Are you sure you want to sign out?',
-                textConfirm: 'Sign out',
-                textCancel: 'Cancel',
-                onConfirm: () {
-                  Get.back();
-                  authController.logout();
-                },
-              );
-            },
-            icon: const Icon(Icons.logout, size: 20),
+            onPressed: () => _showSignOutDialog(authController),
+            icon: const Icon(Icons.logout_rounded, size: 20),
             label: const Text('Sign out', style: TextStyle(fontSize: 14)),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.black,
+              foregroundColor: AppTheme.primaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 12),
             ),
           ),
@@ -212,10 +154,37 @@ class HomeScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
 
+        final currentLevel = profile != null
+            ? GamificationUtils.calculateLevel(profile.xp)
+            : 1;
+        final xpAtCurrentLevel =
+            ((currentLevel - 1) * (currentLevel - 1)) * 100;
+        final xpForNextLevel = (currentLevel * currentLevel) * 100;
+        final xpInCurrentLevel = profile != null
+            ? (profile.xp - xpAtCurrentLevel)
+                  .clamp(0, xpForNextLevel)
+                  .toInt()
+            : 0;
+        final xpNeededForNextLevel = profile != null
+            ? (xpForNextLevel - xpAtCurrentLevel)
+                  .clamp(1, 1 << 30)
+                  .toInt()
+            : 1;
+        final levelProgress = profile != null
+            ? (xpInCurrentLevel / xpNeededForNextLevel)
+                  .clamp(0.0, 1.0)
+                  .toDouble()
+            : 0.0;
+        final dailyTargetXp = profile?.dailyTargetXp ?? 500;
+        final todayXp = profileController.todayXp;
+        final dailyProgress = dailyTargetXp > 0
+            ? (todayXp / dailyTargetXp).clamp(0.0, 1.0).toDouble()
+            : 0.0;
+
         return RefreshIndicator(
           onRefresh: () => profileController.loadProfile(),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -223,19 +192,23 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFE5E7EB)),
                   ),
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 32,
-                        backgroundColor: Colors.blue.shade700,
+                        backgroundColor: AppTheme.primaryColor.withValues(
+                          alpha: 0.10,
+                        ),
                         child: Text(
-                          user.displayName?.substring(0, 1).toUpperCase() ?? 'U',
+                          user.displayName?.substring(0, 1).toUpperCase() ??
+                              'U',
                           style: const TextStyle(
                             fontSize: 28,
-                            color: Colors.white,
+                            color: AppTheme.primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -247,32 +220,44 @@ class HomeScreen extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                _showEditNameDialog(profile, user, profileController, authController);
+                                _showEditNameDialog(
+                                  profile,
+                                  user,
+                                  profileController,
+                                  authController,
+                                );
                               },
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      profile?.displayName ?? user.displayName ?? user.email ?? 'User',
+                                      profile?.displayName ??
+                                          user.displayName ??
+                                          user.email ??
+                                          'User',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
-                                        color: Colors.black,
+                                        color: Color(0xFF111827),
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  Icon(Icons.edit, size: 16, color: Colors.grey),
+                                  const Icon(
+                                    Icons.edit_rounded,
+                                    size: 16,
+                                    color: AppTheme.primaryColor,
+                                  ),
                                 ],
                               ),
                             ),
                             Text(
                               user.email ?? '',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: Color(0xFF6B7280),
                               ),
                             ),
                           ],
@@ -298,7 +283,11 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.star, color: Colors.black, size: 24),
+                              const Icon(
+                                Icons.star_rounded,
+                                color: AppTheme.accentColor,
+                                size: 24,
+                              ),
                               const SizedBox(height: 8),
                               Text(
                                 formatNumber(profile.xp),
@@ -329,7 +318,11 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.emoji_events, color: Colors.black, size: 24),
+                              const Icon(
+                                Icons.emoji_events_rounded,
+                                color: AppTheme.primaryColor,
+                                size: 24,
+                              ),
                               const SizedBox(height: 8),
                               Text(
                                 formatNumber(profile.level),
@@ -362,7 +355,11 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.local_fire_department, color: Colors.black, size: 24),
+                              const Icon(
+                                Icons.local_fire_department_rounded,
+                                color: AppTheme.secondaryColor,
+                                size: 24,
+                              ),
                               const SizedBox(height: 8),
                               Text(
                                 '${profile.streak}',
@@ -386,138 +383,148 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Daily Target',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            '${formatNumberWithSeparator(profile.dailyTargetXp)} XP',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      LinearProgressIndicator(
-                        value: 0.5,
-                        backgroundColor: Colors.grey.shade300,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Level Progress',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            'Level ${profile.level}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      LinearProgressIndicator(
-                        value: (profile.xp % 100) / 100,
-                        backgroundColor: Colors.grey.shade300,
-                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-                        minHeight: 8,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${formatNumberWithSeparator(profile.xp % 100)}/100 XP to next level',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              
-              const SizedBox(height: 32),
-
-              // Quick actions
-              const Text(
-                'Quick Actions',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => Get.to(() => const QuestListScreen()),
-                      icon: const Icon(Icons.task_alt_rounded),
-                      label: const Text('My Quests'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade700,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => Get.to(() => const StudyRoomScreen()),
-                      icon: const Icon(Icons.group_rounded),
-                      label: const Text('Study Room'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple.shade700,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Daily Target',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                            Text(
+                              '${formatNumberWithSeparator(profile.dailyTargetXp)} XP',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
+                        const SizedBox(height: 12),
+                        LinearProgressIndicator(
+                          value: dailyProgress,
+                          backgroundColor: Colors.grey.shade300,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppTheme.primaryColor,
+                          ),
+                          minHeight: 8,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${formatNumberWithSeparator(todayXp)}/${formatNumberWithSeparator(profile.dailyTargetXp)} XP today',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Level Progress',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                            Text(
+                              'Level ${profile.level}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        LinearProgressIndicator(
+                          value: levelProgress,
+                          backgroundColor: Colors.grey.shade300,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            AppTheme.secondaryColor,
+                          ),
+                          minHeight: 8,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${formatNumberWithSeparator(xpInCurrentLevel)}/${formatNumberWithSeparator(xpNeededForNextLevel)} XP to next level',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
-              ),
-            ],
-          ),
+                const SizedBox(height: 32),
+                const Text(
+                  'Quick Actions',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Get.to(() => const QuestListScreen()),
+                        icon: const Icon(Icons.task_alt_rounded),
+                        label: const Text('My Quests'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Get.to(() => const StudyRoomScreen()),
+                        icon: const Icon(Icons.group_rounded),
+                        label: const Text('Study Room'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.secondaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       }),

@@ -12,17 +12,19 @@ import 'core/services/fcm_service.dart';
 import 'core/theme/app_theme.dart';
 import 'routes/app_pages.dart';
 import 'data/datasources/auth_datasource.dart';
+import 'data/datasources/activity_datasource.dart';
 import 'data/datasources/firestore_datasource.dart';
 import 'data/datasources/quest_datasource.dart';
 import 'data/datasources/realtime_db_datasource.dart';
 import 'data/repositories/auth_repository_impl.dart';
+import 'data/repositories/activity_repository_impl.dart';
 import 'data/repositories/user_profile_repository_impl.dart';
 import 'data/repositories/quest_repository_impl.dart';
 import 'data/repositories/room_repository_impl.dart';
-import 'features/auth/controllers/auth_controller.dart';
-import 'features/quests/controllers/quest_controller.dart';
-import 'features/profile/controllers/profile_controller.dart';
-import 'features/study_room/controllers/room_controller.dart';
+import 'controllers/auth_controller.dart';
+import 'controllers/quest_controller.dart';
+import 'controllers/profile_controller.dart';
+import 'controllers/room_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,8 +42,9 @@ void main() async {
         androidProvider: kDebugMode
             ? AndroidProvider.debug
             : AndroidProvider.playIntegrity,
-        appleProvider:
-            kDebugMode ? AppleProvider.debug : AppleProvider.deviceCheck,
+        appleProvider: kDebugMode
+            ? AppleProvider.debug
+            : AppleProvider.deviceCheck,
       );
       await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
       debugPrint('App Check activated');
@@ -65,13 +68,21 @@ void main() async {
   final authRemoteDataSource = AuthRemoteDataSourceImpl(FirebaseAuth.instance);
   final authRepository = AuthRepositoryImpl(authRemoteDataSource);
 
-  final firestoreRemoteDataSource =
-      FirestoreRemoteDataSourceImpl(FirebaseFirestore.instance);
-  final userProfileRepository =
-      UserProfileRepositoryImpl(firestoreRemoteDataSource);
+  final firestoreRemoteDataSource = FirestoreRemoteDataSourceImpl(
+    FirebaseFirestore.instance,
+  );
+  final userProfileRepository = UserProfileRepositoryImpl(
+    firestoreRemoteDataSource,
+  );
 
-  final questRemoteDataSource =
-      QuestRemoteDataSourceImpl(FirebaseFirestore.instance);
+  final activityRemoteDataSource = ActivityRemoteDataSourceImpl(
+    FirebaseFirestore.instance,
+  );
+  final activityRepository = ActivityRepositoryImpl(activityRemoteDataSource);
+
+  final questRemoteDataSource = QuestRemoteDataSourceImpl(
+    FirebaseFirestore.instance,
+  );
   final questRepository = QuestRepositoryImpl(questRemoteDataSource);
 
   final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(
@@ -84,22 +95,22 @@ void main() async {
   final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
 
   final authController = AuthController(authRepository, userProfileRepository);
-  final profileController =
-      ProfileController(userProfileRepository, authController);
-  final questController = QuestController(
-    questRepository,
-    authController,
+  final profileController = ProfileController(
     userProfileRepository,
-    profileController,
+    activityRepository,
+    authController,
   );
+  final questController = QuestController(questRepository, authController);
   final roomController = RoomController(roomRepository, authController);
 
-  runApp(StudyQuestApp(
-    authController: authController,
-    profileController: profileController,
-    questController: questController,
-    roomController: roomController,
-  ));
+  runApp(
+    StudyQuestApp(
+      authController: authController,
+      profileController: profileController,
+      questController: questController,
+      roomController: roomController,
+    ),
+  );
 }
 
 class StudyQuestApp extends StatelessWidget {

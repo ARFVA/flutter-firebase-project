@@ -3,6 +3,13 @@
 Semua perubahan penting dalam projek **StudyQuest**.
 Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0-beta.2] - 2026-10-16
+
+### Fixed
+- Daily XP progress now loads through the activity repository and queries Firestore timestamps for the current local day
+- Quest XP remains server-authoritative and updates from the profile snapshot instead of optimistic client-side increments
+- Profile loading now surfaces repository failures instead of presenting a default profile as a successful load
+
 ## [1.1.0-beta.1] - 2026-10-15
 
 ### Added

@@ -1,25 +1,17 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:studyquest/data/models/quest_model.dart';
 import 'package:studyquest/data/repositories/quest_repository_impl.dart';
-import 'package:studyquest/data/repositories/user_profile_repository_impl.dart';
 import 'package:studyquest/features/auth/controllers/auth_controller.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
-import 'package:studyquest/features/profile/controllers/profile_controller.dart';
 import 'package:uuid/uuid.dart';
 
 class QuestController extends GetxController {
   final QuestRepository repository;
   final AuthController authController;
-  final UserProfileRepository userProfileRepository;
-  final ProfileController profileController;
 
-  QuestController(
-    this.repository,
-    this.authController,
-    this.userProfileRepository,
-    this.profileController,
-  );
+  QuestController(this.repository, this.authController);
 
   // Quest state
   final RxList<QuestModel> _quests = <QuestModel>[].obs;
@@ -37,10 +29,35 @@ class QuestController extends GetxController {
   final RxString _errorMessage = ''.obs;
   String get errorMessage => _errorMessage.value;
 
+  StreamSubscription? _authSub;
+
   @override
   void onInit() {
     super.onInit();
-    loadQuests();
+
+    // If a user is already present, load immediately; otherwise wait for auth
+    if (authController.currentUser != null) {
+      loadQuests();
+    }
+
+    // React to auth changes: load when a user signs in, clear when signs out.
+    _authSub = authController.repository.authStateChanges().listen((user) {
+      if (user != null) {
+        loadQuests();
+      } else {
+        _quests.clear();
+        _activeQuests.clear();
+        _completedQuests.clear();
+        _errorMessage.value = '';
+        _isLoading.value = false;
+      }
+    });
+  }
+
+  @override
+  void onClose() {
+    _authSub?.cancel();
+    super.onClose();
   }
 
   Future<void> loadQuests() async {
@@ -261,8 +278,8 @@ class QuestController extends GetxController {
               duration: const Duration(seconds: 3),
             );
             loadQuests();
-            // Server (Cloud Function) updates the profile asynchronously;
-            // the reactive snapshot in ProfileController picks it up.
+            // XP and daily progress update when the Cloud Function writes the
+            // authoritative profile and activity records.
           },
         );
       },

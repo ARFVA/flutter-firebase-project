@@ -61,10 +61,12 @@ class ActivityRemoteDataSourceImpl implements ActivityRemoteDataSource {
       final snapshot = await firestore
           .collection(FirebaseConstants.activitiesCollection)
           .where('userId', isEqualTo: userId)
-          .where('createdAt', isGreaterThanOrEqualTo: startOfDay.toIso8601String())
-          .where('createdAt', isLessThan: endOfDay.toIso8601String())
+          .where(
+            'createdAt',
+            isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+          )
+          .where('createdAt', isLessThan: Timestamp.fromDate(endOfDay))
           .orderBy('createdAt', descending: true)
-          .orderBy('__name__', descending: true)
           .get();
 
       return snapshot.docs
@@ -81,9 +83,10 @@ class ActivityRemoteDataSourceImpl implements ActivityRemoteDataSource {
   Future<int> getTodayXp(String userId) async {
     try {
       final activities = await getTodayActivities(userId);
-      return activities.fold<int>(0, (total, activity) => total + activity.xpGained);
-    } on FirebaseException catch (e) {
-      throw ServerException('Firestore error: ${e.message}');
+      return activities.fold<int>(
+        0,
+        (total, activity) => total + activity.xpGained,
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }
