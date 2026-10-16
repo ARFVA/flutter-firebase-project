@@ -31,23 +31,30 @@ String formatNumberWithSeparator(int number) {
 
 /// TextInputFormatter that keeps only digits and inserts dot separators.
 class ThousandsSeparatorInputFormatter extends TextInputFormatter {
+  final int maxDigits;
+
+  const ThousandsSeparatorInputFormatter({this.maxDigits = 0});
+
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
     final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final limitedDigits = maxDigits > 0 && digits.length > maxDigits
+        ? digits.substring(0, maxDigits)
+        : digits;
 
-    if (digits.isEmpty) {
+    if (limitedDigits.isEmpty) {
       return newValue.copyWith(text: '');
     }
 
     final buffer = StringBuffer();
-    for (int i = 0; i < digits.length; i++) {
-      if (i > 0 && (digits.length - i) % 3 == 0) {
+    for (int i = 0; i < limitedDigits.length; i++) {
+      if (i > 0 && (limitedDigits.length - i) % 3 == 0) {
         buffer.write('.');
       }
-      buffer.write(digits[i]);
+      buffer.write(limitedDigits[i]);
     }
 
     return TextEditingValue(

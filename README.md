@@ -55,18 +55,30 @@ lib/
 │   ├── services/
 │   ├── theme/
 │   └── utils/
+├── bindings/
+│   └── initial_binding.dart
 ├── data/
-│   ├── models/
 │   ├── datasources/
+│   ├── models/
 │   └── repositories/
+├── controllers/
+│   ├── auth_controller.dart
+│   ├── profile_controller.dart
+│   ├── quest_controller.dart
+│   └── room_controller.dart
 ├── features/
-│   ├── auth/
-│   ├── home/
-│   ├── quests/
+│   ├── auth/       # views/
+│   ├── home/       # views/
 │   ├── profile/
-│   └── study_room/
+│   ├── quests/     # views/
+│   └── study_room/ # views/
 └── routes/
 ```
+
+All application controllers live in `lib/controllers/`. Views remain grouped
+under `lib/features/`; shared dependencies are registered in
+`lib/bindings/initial_binding.dart`. Controllers in `lib/controllers/` are
+implementations, not re-export shims.
 
 ## 🔧 Technologies
 

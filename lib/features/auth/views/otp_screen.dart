@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/core/theme/app_theme.dart';
+import 'package:studyquest/controllers/auth_controller.dart';
+import 'package:studyquest/features/auth/views/auth_page_shell.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -27,108 +29,117 @@ class _OtpScreenState extends State<OtpScreen> {
     final verificationId = args['verificationId'] as String;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Verify OTP'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Icon(
-                    Icons.sms,
-                    size: 80,
-                    color: Colors.deepPurple,
-                  ),
-                  const SizedBox(height: 24),
-                  const Text(
-                    'Enter OTP',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Sent to $phoneNumber',
-                    style: const TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  TextFormField(
-                    controller: _otpController,
-                    decoration: const InputDecoration(
-                      labelText: 'OTP Code',
-                      prefixIcon: Icon(Icons.security),
-                      border: OutlineInputBorder(),
-                      hintText: '123456',
-                    ),
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter OTP code';
-                      }
-                      if (value.length != 6) {
-                        return 'OTP must be 6 digits';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                  Obx(() => ElevatedButton(
-                    onPressed: authController.isLoading
-                        ? null
-                        : () {
-                            if (_formKey.currentState!.validate()) {
-                              authController.verifyOtp(
-                                verificationId,
-                                _otpController.text.trim(),
-                              );
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.deepPurple,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: authController.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            'Verify',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                  )),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      Get.defaultDialog(
-                        title: 'Resend OTP',
-                        middleText: 'Send a new OTP code?',
-                        textConfirm: 'Resend',
-                        textCancel: 'Cancel',
-                        onConfirm: () {
-                          Get.back();
-                          authController.sendOtp(phoneNumber);
-                        },
-                      );
-                    },
-                    child: const Text('Resend OTP'),
-                  ),
-                ],
+      appBar: AppBar(title: const Text('Verify OTP')),
+      body: AuthPageShell(
+        icon: Icons.sms_outlined,
+        title: 'Enter OTP',
+        subtitle: 'Enter the six-digit code sent to $phoneNumber',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextFormField(
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                maxLength: 6,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 8,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'OTP code',
+                  hintText: '123456',
+                  prefixIcon: Icon(Icons.security_outlined, size: 20),
+                  prefixIconColor: AppTheme.primaryColor,
+                  counterText: '',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter OTP code';
+                  }
+                  if (value.length != 6) {
+                    return 'OTP must be 6 digits';
+                  }
+                  return null;
+                },
               ),
-            ),
+              const SizedBox(height: 24),
+              Obx(
+                () => FilledButton(
+                  onPressed: authController.isLoading
+                      ? null
+                      : () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            authController.verifyOtp(
+                              verificationId,
+                              _otpController.text.trim(),
+                            );
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: authController.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Verify code',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => _showResendDialog(authController, phoneNumber),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryColor,
+                ),
+                child: const Text('Resend OTP'),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showResendDialog(AuthController authController, String phoneNumber) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Resend OTP'),
+        content: const Text('Send a new verification code?'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              Get.back();
+              authController.sendOtp(phoneNumber);
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Resend'),
+          ),
+        ],
       ),
     );
   }

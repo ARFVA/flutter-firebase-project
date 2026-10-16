@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/core/theme/app_theme.dart';
+import 'package:studyquest/controllers/auth_controller.dart';
+import 'package:studyquest/features/auth/views/auth_page_shell.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({super.key});
@@ -12,7 +14,7 @@ class PhoneAuthScreen extends StatefulWidget {
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String _selectedCountryCode = '+62'; // Default Indonesia
+  String _selectedCountryCode = '+62';
 
   @override
   void dispose() {
@@ -21,14 +23,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   }
 
   String _formatPhoneNumber(String phone) {
-    // Remove all non-digit characters
-    String digits = phone.replaceAll(RegExp(r'\D'), '');
-    
-    // If starts with 0, remove it (for Indonesia)
+    var digits = phone.replaceAll(RegExp(r'\D'), '');
     if (digits.startsWith('0')) {
       digits = digits.substring(1);
     }
-    
     return '$_selectedCountryCode$digits';
   }
 
@@ -37,200 +35,156 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     final authController = Get.find<AuthController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Phone Authentication',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+      appBar: AppBar(title: const Text('Phone authentication')),
+      body: AuthPageShell(
+        icon: Icons.phone_android_rounded,
+        title: 'Sign in with phone',
+        subtitle: 'We will send you a verification code',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.phone_android,
-                    size: 80,
-                    color: Colors.black,
-                  ),
-                  const SizedBox(height: 32),
-                  const Text(
-                    'Sign in with Phone',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.black,
-                      letterSpacing: -1,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'We will send you a verification code',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _selectedCountryCode,
-                            items: const [
-                              DropdownMenuItem(value: '+62', child: Text('+62')),
-                              DropdownMenuItem(value: '+1', child: Text('+1')),
-                              DropdownMenuItem(value: '+44', child: Text('+44')),
-                              DropdownMenuItem(value: '+81', child: Text('+81')),
-                              DropdownMenuItem(value: '+86', child: Text('+86')),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCountryCode = value ?? '+62';
-                              });
-                            },
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _phoneController,
-                          decoration: InputDecoration(
-                            labelText: 'Phone Number',
-                            hintText: '812 3456 7890',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: const BorderSide(color: Colors.black, width: 2),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
-                            ),
-                          ),
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your phone number';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Formatted: ${_formatPhoneNumber(_phoneController.text)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    height: 56,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      border: Border.all(color: Colors.orange.shade300),
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.orange.shade700, size: 20),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Phone authentication may not work in all regions. Indonesia SMS is not yet enabled by Firebase.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.orange.shade700,
-                            ),
-                          ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedCountryCode,
+                        items: const [
+                          DropdownMenuItem(value: '+62', child: Text('+62')),
+                          DropdownMenuItem(value: '+1', child: Text('+1')),
+                          DropdownMenuItem(value: '+44', child: Text('+44')),
+                          DropdownMenuItem(value: '+81', child: Text('+81')),
+                          DropdownMenuItem(value: '+86', child: Text('+86')),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCountryCode = value ?? '+62';
+                          });
+                        },
+                        style: const TextStyle(
+                          color: AppTheme.primaryColor,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  Obx(() => ElevatedButton(
-                    onPressed: authController.isLoading
-                        ? null
-                        : () {
-                            if (_formKey.currentState!.validate()) {
-                              final formattedPhone = _formatPhoneNumber(_phoneController.text.trim());
-                              authController.sendOtp(formattedPhone);
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
+                        labelText: 'Phone number',
+                        hintText: '812 3456 7890',
+                        prefixIcon: Icon(Icons.phone_outlined, size: 20),
+                        prefixIconColor: AppTheme.primaryColor,
                       ),
-                      elevation: 0,
-                    ),
-                    child: authController.isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text(
-                            'Send OTP',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                  )),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: const Text(
-                      'Back to Email Login',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      onChanged: (_) => setState(() {}),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                'Number to verify: ${_formatPhoneNumber(_phoneController.text)}',
+                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppTheme.accentColor.withValues(alpha: 0.10),
+                  border: Border.all(
+                    color: AppTheme.accentColor.withValues(alpha: 0.40),
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      color: AppTheme.accentColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Phone authentication may not work in all regions. Indonesia SMS is not yet enabled by Firebase.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          height: 1.45,
+                          color: Colors.brown.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Obx(
+                () => FilledButton(
+                  onPressed: authController.isLoading
+                      ? null
+                      : () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            authController.sendOtp(
+                              _formatPhoneNumber(_phoneController.text.trim()),
+                            );
+                          }
+                        },
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: authController.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Send OTP',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Get.back(),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryColor,
+                ),
+                child: const Text('Back to email login'),
+              ),
+            ],
           ),
         ),
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:studyquest/core/widgets/primary_button.dart';
-import 'package:studyquest/features/study_room/controllers/room_controller.dart';
+import 'package:studyquest/core/theme/app_theme.dart';
+import 'package:studyquest/controllers/room_controller.dart';
 import 'package:studyquest/data/models/room_model.dart';
 
 class StudyRoomScreen extends StatelessWidget {
@@ -13,65 +13,89 @@ class StudyRoomScreen extends StatelessWidget {
     final roomController = Get.find<RoomController>();
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Study Room',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          Obx(() => PopupMenuButton<String>(
-            icon: Icon(
-              roomController.currentStatus == 'studying' ? Icons.book : Icons.coffee,
-              color: Colors.black,
+        title: Row(
+          children: [
+            const Icon(
+              Icons.groups_rounded,
+              color: AppTheme.primaryColor,
+              size: 24,
             ),
-            onSelected: (status) {
-              roomController.updateStatus(status);
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'studying',
-                child: Row(
-                  children: [
-                    Icon(Icons.book, size: 20),
-                    SizedBox(width: 8),
-                    Text('Studying'),
+            const SizedBox(width: 10),
+            const Text('Study Room'),
+          ],
+        ),
+        actions: [
+          Obx(() {
+            if (roomController.currentRoomId.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    roomController.currentStatus == 'studying'
+                        ? Icons.book_rounded
+                        : Icons.coffee_rounded,
+                    color: AppTheme.primaryColor,
+                  ),
+                  onSelected: roomController.updateStatus,
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'studying',
+                      child: Row(
+                        children: [
+                          Icon(Icons.book_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text('Studying'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'break',
+                      child: Row(
+                        children: [
+                          Icon(Icons.coffee_rounded, size: 20),
+                          SizedBox(width: 8),
+                          Text('Break'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              const PopupMenuItem(
-                value: 'break',
-                child: Row(
-                  children: [
-                    Icon(Icons.coffee, size: 20),
-                    SizedBox(width: 8),
-                    Text('Break'),
-                  ],
+                IconButton(
+                  icon: const Icon(Icons.exit_to_app_rounded),
+                  onPressed: () {
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text('Leave Room'),
+                        content: const Text('Are you sure you want to leave?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('Cancel'),
+                          ),
+                          FilledButton(
+                            onPressed: () {
+                              Get.back();
+                              roomController.leaveRoom();
+                            },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppTheme.primaryColor,
+                              foregroundColor: Colors.white,
+                            ),
+                            child: const Text('Leave'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ),
-            ],
-          )),
-          IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Colors.black),
-            onPressed: () {
-              Get.defaultDialog(
-                title: 'Leave Room',
-                middleText: 'Are you sure you want to leave?',
-                textConfirm: 'Leave',
-                textCancel: 'Cancel',
-                onConfirm: () {
-                  Get.back();
-                  roomController.leaveRoom();
-                },
-              );
-            },
-          ),
+              ],
+            );
+          }),
         ],
       ),
       body: Obx(() {
@@ -81,7 +105,7 @@ class StudyRoomScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.meeting_room,
+                  Icons.meeting_room_outlined,
                   size: 80,
                   color: Colors.grey.shade300,
                 ),
@@ -90,53 +114,50 @@ class StudyRoomScreen extends StatelessWidget {
                   'No active room',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF111827),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Create or join a study room to study together',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    OutlinedButton.icon(
+                    FilledButton.icon(
                       onPressed: () => _showCreateRoomDialog(roomController),
-                      icon: const Icon(Icons.add, size: 20),
+                      icon: const Icon(Icons.add_rounded, size: 18),
                       label: const Text('Create Room'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Colors.black),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
+                          horizontal: 18,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     OutlinedButton.icon(
                       onPressed: () => _showJoinRoomDialog(roomController),
-                      icon: const Icon(Icons.login, size: 20),
+                      icon: const Icon(Icons.login_rounded, size: 18),
                       label: const Text('Join Room'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Colors.black),
+                        foregroundColor: AppTheme.primaryColor,
+                        side: const BorderSide(color: AppTheme.primaryColor),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
+                          horizontal: 18,
+                          vertical: 14,
                         ),
                       ),
                     ),
@@ -149,60 +170,66 @@ class StudyRoomScreen extends StatelessWidget {
 
         return Column(
           children: [
-            // Room info header
             Container(
-              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey.shade300),
-                ),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE5E7EB)),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Icon(Icons.meeting_room, color: Colors.blue.shade700),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Room ID',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              roomController.currentRoomId,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: const Icon(
+                      Icons.meeting_room_outlined,
+                      color: AppTheme.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Room ID',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.copy, size: 20),
-                        onPressed: () async {
-                          // Copy room ID to clipboard
-                          await Clipboard.setData(ClipboardData(text: roomController.currentRoomId));
-                          Get.snackbar(
-                            'Room ID',
-                            'Copied to clipboard!',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green.shade700,
-                            colorText: Colors.white,
-                          );
-                        },
-                      ),
-                    ],
+                        Text(
+                          roomController.currentRoomId,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.copy_rounded, size: 20),
+                    onPressed: () async {
+                      await Clipboard.setData(
+                        ClipboardData(text: roomController.currentRoomId),
+                      );
+                      Get.snackbar(
+                        'Room ID',
+                        'Copied to clipboard!',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green.shade700,
+                        colorText: Colors.white,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -210,11 +237,9 @@ class StudyRoomScreen extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 final participants = roomController.participants;
-                
+
                 if (participants.isEmpty) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 return ListView.builder(
@@ -240,7 +265,7 @@ class StudyRoomScreen extends StatelessWidget {
     switch (participant.status) {
       case 'studying':
         statusIcon = Icons.circle;
-        statusColor = Colors.green;
+        statusColor = AppTheme.successColor;
         break;
       case 'break':
         statusIcon = Icons.circle;
@@ -254,20 +279,21 @@ class StudyRoomScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white,
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
-          backgroundColor: statusColor.withValues(alpha: 0.2),
+          backgroundColor: statusColor.withValues(alpha: 0.14),
           child: Icon(statusIcon, color: statusColor),
         ),
         title: Text(
           participant.displayName,
           style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF111827),
           ),
         ),
         subtitle: Column(
@@ -277,17 +303,14 @@ class StudyRoomScreen extends StatelessWidget {
               participant.status.toUpperCase(),
               style: TextStyle(
                 color: statusColor,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               _formatTime(participant.lastSeen),
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
             ),
           ],
         ),
@@ -298,7 +321,7 @@ class StudyRoomScreen extends StatelessWidget {
   String _formatTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inMinutes < 1) {
       return 'Just now';
     } else if (difference.inMinutes < 60) {
@@ -321,25 +344,25 @@ class StudyRoomScreen extends StatelessWidget {
           decoration: const InputDecoration(
             labelText: 'Room Name',
             hintText: 'Study Session 1',
-            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.meeting_room_outlined, size: 20),
+            prefixIconColor: AppTheme.primaryColor,
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Create',
-            icon: Icons.add,
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          FilledButton(
             onPressed: () {
-              if (roomNameController.text.trim().isNotEmpty) {
+              final name = roomNameController.text.trim();
+              if (name.isNotEmpty) {
                 Get.back();
-                controller.createRoom(roomNameController.text.trim());
+                controller.createRoom(name);
               }
             },
-            color: Colors.green.shade700,
-            isFullWidth: false,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Create'),
           ),
         ],
       ),
@@ -357,25 +380,25 @@ class StudyRoomScreen extends StatelessWidget {
           decoration: const InputDecoration(
             labelText: 'Room ID',
             hintText: 'Enter room ID',
-            border: OutlineInputBorder(),
+            prefixIcon: Icon(Icons.key_rounded, size: 20),
+            prefixIconColor: AppTheme.primaryColor,
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          PrimaryButton(
-            label: 'Join',
-            icon: Icons.login,
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          FilledButton(
             onPressed: () {
-              if (roomIdController.text.trim().isNotEmpty) {
+              final roomId = roomIdController.text.trim();
+              if (roomId.isNotEmpty) {
                 Get.back();
-                controller.joinRoom(roomIdController.text.trim());
+                controller.joinRoom(roomId);
               }
             },
-            color: Colors.green.shade700,
-            isFullWidth: false,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Join'),
           ),
         ],
       ),

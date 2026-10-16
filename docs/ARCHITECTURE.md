@@ -31,22 +31,36 @@ StudyQuest follows a Clean Architecture pattern with clear separation of concern
 - **services/**: Shared services (networking, logging, etc.)
 - **utils/**: Utility functions and helpers
 
+#### Bindings (`lib/bindings/`)
+- **initial_binding.dart**: Registers shared data sources, repositories, and feature controllers through GetX.
+
 #### Data Layer (`lib/data/`)
 - **datasources/**: Remote and local data sources (Firebase, SharedPreferences, etc.)
 - **models/**: Data models and DTOs
 - **repositories/**: Repository implementations
 
+#### Controllers (`lib/controllers/`)
+- Contains the controller implementations for auth, profile, quests, and study rooms.
+- Controllers are grouped in this top-level folder rather than duplicated inside feature directories.
+
 #### Features Layer (`lib/features/`)
-Each feature follows the structure:
+Features contain their user-facing views and are organized by product capability:
 ```
 features/
 ├── auth/
-│   ├── controllers/
-│   ├── models/
-│   ├── repositories/
-│   ├── services/
 │   └── views/
+├── home/
+│   └── views/
+├── profile/
+├── quests/
+│   └── views/
+└── study_room/
+    └── views/
 ```
+
+Controller files in `lib/controllers/` contain the actual implementations.
+Views import those implementations directly. Application dependencies are
+registered in `lib/bindings/`.
 
 ### State Management
 

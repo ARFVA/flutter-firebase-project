@@ -185,11 +185,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
               ),
               keyboardType: TextInputType.number,
               inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                ThousandsSeparatorInputFormatter(),
-                LengthLimitingTextInputFormatter(
-                  8,
-                ), // Max 8 digits with separator
+                ThousandsSeparatorInputFormatter(maxDigits: 8),
               ],
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -238,8 +234,7 @@ class _CreateQuestScreenState extends State<CreateQuestScreen> {
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  ThousandsSeparatorInputFormatter(),
+                  ThousandsSeparatorInputFormatter(maxDigits: 6),
                 ],
                 validator: (value) {
                   if (value == null || value.isEmpty) {

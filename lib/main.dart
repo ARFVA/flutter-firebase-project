@@ -2,29 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 import 'core/constants/app_constants.dart';
 import 'core/services/fcm_service.dart';
 import 'core/theme/app_theme.dart';
+import 'bindings/initial_binding.dart';
 import 'routes/app_pages.dart';
-import 'data/datasources/auth_datasource.dart';
-import 'data/datasources/activity_datasource.dart';
-import 'data/datasources/firestore_datasource.dart';
-import 'data/datasources/quest_datasource.dart';
-import 'data/datasources/realtime_db_datasource.dart';
-import 'data/repositories/auth_repository_impl.dart';
-import 'data/repositories/activity_repository_impl.dart';
-import 'data/repositories/user_profile_repository_impl.dart';
-import 'data/repositories/quest_repository_impl.dart';
-import 'data/repositories/room_repository_impl.dart';
-import 'controllers/auth_controller.dart';
-import 'controllers/quest_controller.dart';
-import 'controllers/profile_controller.dart';
-import 'controllers/room_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,68 +48,11 @@ void main() async {
     debugPrint('Firebase initialization error: $e');
   }
 
-  // Initialize dependencies (manual DI kept explicit for readability).
-  final authRemoteDataSource = AuthRemoteDataSourceImpl(FirebaseAuth.instance);
-  final authRepository = AuthRepositoryImpl(authRemoteDataSource);
-
-  final firestoreRemoteDataSource = FirestoreRemoteDataSourceImpl(
-    FirebaseFirestore.instance,
-  );
-  final userProfileRepository = UserProfileRepositoryImpl(
-    firestoreRemoteDataSource,
-  );
-
-  final activityRemoteDataSource = ActivityRemoteDataSourceImpl(
-    FirebaseFirestore.instance,
-  );
-  final activityRepository = ActivityRepositoryImpl(activityRemoteDataSource);
-
-  final questRemoteDataSource = QuestRemoteDataSourceImpl(
-    FirebaseFirestore.instance,
-  );
-  final questRepository = QuestRepositoryImpl(questRemoteDataSource);
-
-  final realtimeDBRemoteDataSource = RealtimeDBRemoteDataSourceImpl(
-    FirebaseDatabase.instanceFor(
-      app: Firebase.app(),
-      databaseURL:
-          'https://studyquest-firebase-default-rtdb.asia-southeast1.firebasedatabase.app',
-    ),
-  );
-  final roomRepository = RoomRepositoryImpl(realtimeDBRemoteDataSource);
-
-  final authController = AuthController(authRepository, userProfileRepository);
-  final profileController = ProfileController(
-    userProfileRepository,
-    activityRepository,
-    authController,
-  );
-  final questController = QuestController(questRepository, authController);
-  final roomController = RoomController(roomRepository, authController);
-
-  runApp(
-    StudyQuestApp(
-      authController: authController,
-      profileController: profileController,
-      questController: questController,
-      roomController: roomController,
-    ),
-  );
+  runApp(const StudyQuestApp());
 }
 
 class StudyQuestApp extends StatelessWidget {
-  final AuthController authController;
-  final ProfileController profileController;
-  final QuestController questController;
-  final RoomController roomController;
-
-  const StudyQuestApp({
-    super.key,
-    required this.authController,
-    required this.profileController,
-    required this.questController,
-    required this.roomController,
-  });
+  const StudyQuestApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -135,12 +62,7 @@ class StudyQuestApp extends StatelessWidget {
       theme: AppTheme.light(),
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
-      initialBinding: BindingsBuilder(() {
-        Get.put(authController);
-        Get.put(profileController);
-        Get.put(questController);
-        Get.put(roomController);
-      }),
+      initialBinding: InitialBinding(),
     );
   }
 }

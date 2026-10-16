@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:studyquest/features/auth/controllers/auth_controller.dart';
+import 'package:studyquest/controllers/auth_controller.dart';
 import 'package:studyquest/features/auth/views/login_screen.dart';
 import 'package:studyquest/features/auth/views/register_screen.dart';
 import 'package:studyquest/features/auth/views/phone_auth_screen.dart';
@@ -9,8 +9,7 @@ import 'package:studyquest/features/home/views/home_screen.dart';
 import 'package:studyquest/features/quests/views/quest_list_screen.dart';
 import 'package:studyquest/features/quests/views/create_quest_screen.dart';
 import 'package:studyquest/features/study_room/views/study_room_screen.dart';
-
-part 'app_routes.dart';
+import 'app_routes.dart';
 
 class AppPages {
   static const INITIAL = Routes.LOGIN;

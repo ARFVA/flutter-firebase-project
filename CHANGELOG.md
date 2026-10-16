@@ -3,6 +3,16 @@
 Semua perubahan penting dalam projek **StudyQuest**.
 Format ini berdasar [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0-beta.3] - 2026-10-16
+
+### Changed
+- Centralized GetX dependency registration in `InitialBinding`
+- Moved controller implementations into the top-level `lib/controllers/` directory and documented the shared controller structure
+- Decoupled route constants from `app_pages.dart` using a regular import
+
+### Removed
+- Removed the unused `PrimaryButton` widget after confirming it had no call sites
+
 ## [1.1.0-beta.2] - 2026-10-16
 
 ### Fixed
